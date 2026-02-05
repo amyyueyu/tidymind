@@ -159,7 +159,7 @@ import { Sparkles, Leaf, Play } from "lucide-react";
                 onClick={() => navigate("/demo")}
               >
                 <Play className="w-4 h-4 mr-2" />
-                Try One Room Free
+                Try One Room as a Guest
               </Button>
            </CardContent>
          </Card>
