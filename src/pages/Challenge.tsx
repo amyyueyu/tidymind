@@ -19,9 +19,14 @@
    Clock,
    Trophy,
    Sparkles,
-   Eye
+  Eye,
+  CheckCircle2,
+  Circle,
+  FastForward
  } from "lucide-react";
  import VisionComparison from "@/components/VisionComparison";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
  
  interface Challenge {
    id: string;
@@ -111,11 +116,12 @@
        setChallenges(challengeData);
        // Find first incomplete challenge
        const firstIncomplete = challengeData.findIndex(c => c.status !== "completed");
-       setCurrentChallengeIndex(firstIncomplete >= 0 ? firstIncomplete : 0);
+        const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+        setCurrentChallengeIndex(initialIndex);
        
        // Set timer for current challenge
-       if (challengeData[firstIncomplete]) {
-         setTimeRemaining(challengeData[firstIncomplete].time_estimate_minutes * 60);
+        if (challengeData[initialIndex]) {
+          setTimeRemaining(challengeData[initialIndex].time_estimate_minutes * 60);
        }
      }
  
@@ -209,6 +215,26 @@
      toast("Challenge skipped. No worries, you can come back to it!");
    };
  
+  const selectChallenge = (index: number) => {
+    const challenge = challenges[index];
+    if (challenge.status === "completed") return; // Don't allow selecting completed challenges
+    
+    setTimerActive(false);
+    setCurrentChallengeIndex(index);
+    setTimeRemaining(challenge.time_estimate_minutes * 60);
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "completed":
+        return <CheckCircle2 className="w-5 h-5 text-primary" />;
+      case "skipped":
+        return <FastForward className="w-5 h-5 text-muted-foreground" />;
+      default:
+        return <Circle className="w-5 h-5 text-muted-foreground" />;
+    }
+  };
+
    if (loading || authLoading) {
      return (
        <div className="min-h-screen flex items-center justify-center bg-background">
@@ -281,72 +307,122 @@
            </div>
          )}
  
-         {/* Timer */}
-         <Card className="border-0 shadow-lg mb-6 animate-scale-in">
-           <CardContent className="p-6 text-center">
-             <div className={`text-6xl font-bold mb-2 ${timerActive ? "text-primary" : "text-muted-foreground"}`}>
-               {formatTime(timeRemaining)}
-             </div>
-             <div className="flex justify-center gap-3">
-               {!timerActive ? (
-                 <Button onClick={startTimer} size="lg" className="gap-2">
-                   <Play className="w-5 h-5" />
-                   Start Timer
-                 </Button>
-               ) : (
-                 <Button onClick={() => setTimerActive(false)} variant="outline" size="lg" className="gap-2">
-                   <Pause className="w-5 h-5" />
-                   Pause
-                 </Button>
-               )}
-             </div>
-           </CardContent>
-         </Card>
+          {/* Challenge List */}
+          <Card className="border-0 shadow-sm mb-4 animate-fade-in">
+            <CardContent className="p-3">
+              <p className="text-xs text-muted-foreground mb-2 px-1">Select a task to work on:</p>
+              <ScrollArea className="max-h-48">
+                <div className="space-y-1">
+                  {challenges.map((challenge, index) => (
+                    <button
+                      key={challenge.id}
+                      onClick={() => selectChallenge(index)}
+                      disabled={challenge.status === "completed"}
+                      className={cn(
+                        "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
+                        index === currentChallengeIndex && challenge.status !== "completed"
+                          ? "bg-primary/10 border border-primary/20"
+                          : "hover:bg-muted/50",
+                        challenge.status === "completed" && "opacity-60 cursor-not-allowed"
+                      )}
+                    >
+                      {getStatusIcon(challenge.status)}
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          "text-sm font-medium truncate",
+                          challenge.status === "completed" && "line-through"
+                        )}>
+                          {challenge.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          ~{challenge.time_estimate_minutes} min · {challenge.points} pts
+                        </p>
+                      </div>
+                      {index === currentChallengeIndex && challenge.status !== "completed" && (
+                        <Badge variant="secondary" className="shrink-0 text-xs">
+                          Active
+                        </Badge>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
  
-         {/* Current Challenge */}
-         <Card className="border-0 shadow-sm flex-1 mb-6 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-           <CardContent className="p-6">
-             <div className="flex items-center gap-2 mb-4">
-               <Clock className="w-4 h-4 text-muted-foreground" />
-               <span className="text-sm text-muted-foreground">
-                 ~{currentChallenge.time_estimate_minutes} minutes
-               </span>
-             </div>
-             <h2 className="text-2xl font-bold mb-3">{currentChallenge.title}</h2>
-             {currentChallenge.description && (
-               <p className="text-muted-foreground">{currentChallenge.description}</p>
-             )}
-           </CardContent>
-         </Card>
+          {/* Selected Challenge Details + Timer */}
+          {currentChallenge && currentChallenge.status !== "completed" && (
+            <>
+              <Card className="border-0 shadow-lg mb-4 animate-scale-in">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="flex-1">
+                      <h2 className="text-xl font-bold mb-2">{currentChallenge.title}</h2>
+                      {currentChallenge.description && (
+                        <p className="text-sm text-muted-foreground">{currentChallenge.description}</p>
+                      )}
+                    </div>
+                    <Badge variant="secondary" className="shrink-0">
+                      <Star className="w-3 h-3 mr-1" />
+                      {currentChallenge.points} pts
+                    </Badge>
+                  </div>
+                  
+                  {/* Timer */}
+                  <div className="text-center pt-4 border-t border-border">
+                    <div className={cn(
+                      "text-5xl font-bold mb-3",
+                      timerActive ? "text-primary" : "text-muted-foreground"
+                    )}>
+                      {formatTime(timeRemaining)}
+                    </div>
+                    <div className="flex justify-center gap-3">
+                      {!timerActive ? (
+                        <Button onClick={startTimer} size="lg" className="gap-2">
+                          <Play className="w-5 h-5" />
+                          Start Timer
+                        </Button>
+                      ) : (
+                        <Button onClick={() => setTimerActive(false)} variant="outline" size="lg" className="gap-2">
+                          <Pause className="w-5 h-5" />
+                          Pause
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
  
-         {/* Encouragement */}
-         <Card className="border-0 shadow-sm bg-accent/20 mb-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-           <CardContent className="p-4 flex items-center gap-3">
-             <Sparkles className="w-5 h-5 text-accent-foreground shrink-0" />
-             <p className="text-sm text-accent-foreground">
-               Focus on this one thing. You've got this! 💪
-             </p>
-           </CardContent>
-         </Card>
+              {/* Encouragement */}
+              <Card className="border-0 shadow-sm bg-accent/20 mb-4 animate-fade-in">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Sparkles className="w-5 h-5 text-accent-foreground shrink-0" />
+                  <p className="text-sm text-accent-foreground">
+                    Focus on this one thing. You've got this! 💪
+                  </p>
+                </CardContent>
+              </Card>
  
-         {/* Action Buttons */}
-         <div className="flex gap-3 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-           <Button 
-             variant="outline" 
-             className="flex-1 h-14"
-             onClick={skipChallenge}
-           >
-             <SkipForward className="w-5 h-5 mr-2" />
-             Skip
-           </Button>
-           <Button 
-             className="flex-[2] h-14 text-base"
-             onClick={completeChallenge}
-           >
-             <Check className="w-5 h-5 mr-2" />
-             Done!
-           </Button>
-         </div>
+              {/* Action Buttons */}
+              <div className="flex gap-3 animate-fade-in">
+                <Button 
+                  variant="outline" 
+                  className="flex-1 h-14"
+                  onClick={skipChallenge}
+                >
+                  <SkipForward className="w-5 h-5 mr-2" />
+                  Skip
+                </Button>
+                <Button 
+                  className="flex-[2] h-14 text-base"
+                  onClick={completeChallenge}
+                >
+                  <Check className="w-5 h-5 mr-2" />
+                  Done!
+                </Button>
+              </div>
+            </>
+          )}
        </main>
      </div>
    );
