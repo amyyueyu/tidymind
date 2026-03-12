@@ -80,6 +80,7 @@ export const GuestModeProvider = ({ children }: { children: ReactNode }) => {
       isGuest,
       guestRoom,
       guestChallenges,
+      startGuestMode,
       setGuestSession,
       updateGuestChallenge,
       updateGuestRoom,
