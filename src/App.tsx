@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Capture from "./pages/Capture";
 import Challenge from "./pages/Challenge";
 import Demo from "./pages/Demo";
+import Stats from "./pages/Stats";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/capture" element={<Capture />} />
             <Route path="/challenge/:roomId" element={<Challenge />} />
             <Route path="/demo" element={<Demo />} />
+            <Route path="/stats" element={<Stats />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

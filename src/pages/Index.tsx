@@ -15,7 +15,8 @@ import {
   LogOut,
   Leaf,
   ArrowRight,
-  Sparkles
+  Sparkles,
+  BarChart2
 } from "lucide-react";
 
 const GREETINGS = [
@@ -89,9 +90,14 @@ const Index = () => {
             <Leaf className="w-6 h-6 text-primary" />
             <span className="font-semibold text-lg">TidyMate</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={signOut}>
-            <LogOut className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/stats")}>
+              <BarChart2 className="w-5 h-5" />
+            </Button>
+            <Button variant="ghost" size="icon" onClick={signOut}>
+              <LogOut className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
       </header>
 
