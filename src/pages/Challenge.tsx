@@ -425,7 +425,10 @@ const ChallengePage = () => {
           <Button
             variant="outline"
             className="mb-4 gap-2 animate-fade-in"
-            onClick={() => setShowVision(!showVision)}
+            onClick={() => {
+              if (!showVision) fetchBeforeImage();
+              setShowVision(!showVision);
+            }}
           >
             <Eye className="w-4 h-4" />
             {showVision ? "Hide Vision" : "See Your Vision"}
@@ -435,8 +438,9 @@ const ChallengePage = () => {
         {showVision && room.after_image_url && (
           <div className="mb-6 animate-scale-in">
             <VisionComparison
-              beforeImage={room.before_image_url}
+              beforeImage={beforeImageUrl ?? ""}
               afterImage={room.after_image_url}
+              isGenerating={loadingBeforeImage && !beforeImageUrl}
             />
           </div>
         )}
