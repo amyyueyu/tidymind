@@ -312,7 +312,7 @@ const ChallengePage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Leaf className="w-12 h-12 text-primary mx-auto animate-gentle-bounce" />
+          <img src={logoIcon} alt="TidyMate" className="w-12 h-12 mx-auto animate-gentle-bounce" />
           <p className="mt-4 text-muted-foreground">Loading challenges...</p>
         </div>
       </div>

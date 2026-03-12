@@ -284,7 +284,7 @@ const Capture = () => {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2">
-            <Leaf className="w-5 h-5 text-primary" />
+            <img src={logoIcon} alt="TidyMate" className="w-5 h-5" />
             <span className="font-semibold">Capture Space</span>
           </div>
           {isGuest && (
