@@ -141,7 +141,51 @@ const ChallengePage = () => {
     setTimerActive(false);
   };
 
-  const completeChallenge = async () => {
+  const fetchRoomData = async () => {
+    setLoading(true);
+    const { data: roomData, error: roomError } = await supabase
+      .from("rooms")
+      .select("*")
+      .eq("id", roomId)
+      .single();
+
+    if (roomError) {
+      toast.error("Room not found");
+      navigate("/");
+      return;
+    }
+    setRoom(roomData);
+
+    const { data: challengeData } = await supabase
+      .from("challenges")
+      .select("*")
+      .eq("room_id", roomId)
+      .order("sort_order", { ascending: true });
+
+    if (challengeData) {
+      setChallenges(challengeData);
+      const firstIncomplete = challengeData.findIndex((c) => c.status !== "completed");
+      const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+      setCurrentChallengeIndex(initialIndex);
+      if (challengeData[initialIndex]) {
+        setTimeRemaining(challengeData[initialIndex].time_estimate_minutes * 60);
+      }
+    }
+    setLoading(false);
+  };
+
+  const currentChallenge = challenges[currentChallengeIndex];
+  const completedCount = challenges.filter((c) => c.status === "completed").length;
+  const progressPercent = challenges.length > 0 ? (completedCount / challenges.length) * 100 : 0;
+  const allDone = challenges.length > 0 && completedCount === challenges.length;
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+
     if (!currentChallenge || !room) return;
     setTimerActive(false);
 
