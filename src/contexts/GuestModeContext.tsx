@@ -42,6 +42,14 @@ export const GuestModeProvider = ({ children }: { children: ReactNode }) => {
   const [guestChallenges, setGuestChallenges] = useState<GuestChallenge[]>([]);
   const [sessionUsed, setSessionUsed] = useState(false);
 
+  const startGuestMode = () => {
+    setIsGuest(true);
+    sessionStorage.setItem("guestMode", "true");
+    setGuestRoom(null);
+    setGuestChallenges([]);
+    setSessionUsed(false);
+  };
+
   const setGuestSession = (room: GuestRoom, challenges: GuestChallenge[]) => {
     setIsGuest(true);
     sessionStorage.setItem("guestMode", "true");
