@@ -43,7 +43,7 @@ interface Challenge {
 interface Room {
   id: string;
   name: string;
-  before_image_url: string;
+  before_image_url?: string | null;
   after_image_url: string | null;
   intent: string;
   total_challenges: number;
@@ -73,6 +73,8 @@ const ChallengePage = () => {
   const [loading, setLoading] = useState(true);
   const [showVision, setShowVision] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [beforeImageUrl, setBeforeImageUrl] = useState<string | null>(null);
+  const [loadingBeforeImage, setLoadingBeforeImage] = useState(false);
 
   // Refs to avoid stale closures in timer and to gate guest hydration
   const challengesRef = useRef<Challenge[]>([]);
@@ -93,6 +95,7 @@ const ChallengePage = () => {
   // Load room data — guest branch only runs ONCE per roomId via ref gate
   useEffect(() => {
     if (isGuest && guestRoom && roomId === guestRoom.id) {
+      if (guestRoom.before_image_url) setBeforeImageUrl(guestRoom.before_image_url);
       // Only hydrate initial index once; subsequent renders must not reset selection
       if (guestHydratedRoomIdRef.current !== roomId) {
         guestHydratedRoomIdRef.current = roomId;
@@ -157,9 +160,10 @@ const ChallengePage = () => {
 
   const fetchRoomData = async () => {
     setLoading(true);
+    // Exclude before_image_url from initial fetch — old rows may have multi-MB base64 blobs
     const { data: roomData, error: roomError } = await supabase
       .from("rooms")
-      .select("*")
+      .select("id, name, intent, total_challenges, completed_challenges, status, after_image_url")
       .eq("id", roomId)
       .single();
 
@@ -172,7 +176,7 @@ const ChallengePage = () => {
 
     const { data: challengeData } = await supabase
       .from("challenges")
-      .select("*")
+      .select("id, title, description, time_estimate_minutes, points, status, sort_order")
       .eq("room_id", roomId)
       .order("sort_order", { ascending: true });
 
@@ -186,6 +190,19 @@ const ChallengePage = () => {
       }
     }
     setLoading(false);
+  };
+
+  // Lazy-load the before image only when the user clicks "See Your Vision"
+  const fetchBeforeImage = async () => {
+    if (beforeImageUrl || loadingBeforeImage || !roomId) return;
+    setLoadingBeforeImage(true);
+    const { data } = await supabase
+      .from("rooms")
+      .select("before_image_url")
+      .eq("id", roomId)
+      .single();
+    if (data?.before_image_url) setBeforeImageUrl(data.before_image_url);
+    setLoadingBeforeImage(false);
   };
 
   const currentChallenge = challenges[currentChallengeIndex];
@@ -408,7 +425,10 @@ const ChallengePage = () => {
           <Button
             variant="outline"
             className="mb-4 gap-2 animate-fade-in"
-            onClick={() => setShowVision(!showVision)}
+            onClick={() => {
+              if (!showVision) fetchBeforeImage();
+              setShowVision(!showVision);
+            }}
           >
             <Eye className="w-4 h-4" />
             {showVision ? "Hide Vision" : "See Your Vision"}
@@ -418,8 +438,9 @@ const ChallengePage = () => {
         {showVision && room.after_image_url && (
           <div className="mb-6 animate-scale-in">
             <VisionComparison
-              beforeImage={room.before_image_url}
+              beforeImage={beforeImageUrl ?? ""}
               afterImage={room.after_image_url}
+              isGenerating={loadingBeforeImage && !beforeImageUrl}
             />
           </div>
         )}
