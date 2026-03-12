@@ -74,6 +74,15 @@ const ChallengePage = () => {
   const [showVision, setShowVision] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
 
+  // Refs to avoid stale closures in timer and to gate guest hydration
+  const challengesRef = useRef<Challenge[]>([]);
+  const challengeIndexRef = useRef(0);
+  const guestHydratedRoomIdRef = useRef<string | null>(null);
+
+  // Keep refs in sync with state on every render
+  challengesRef.current = challenges;
+  challengeIndexRef.current = currentChallengeIndex;
+
   // Auth guard
   useEffect(() => {
     if (!authLoading && !user && !isGuest) {
@@ -81,17 +90,21 @@ const ChallengePage = () => {
     }
   }, [user, authLoading, isGuest, navigate]);
 
-  // Load room data
+  // Load room data — guest branch only runs ONCE per roomId via ref gate
   useEffect(() => {
     if (isGuest && guestRoom && roomId === guestRoom.id) {
-      setRoom(guestRoom);
-      const mappedChallenges: Challenge[] = guestChallenges.map((c) => ({ ...c }));
-      setChallenges(mappedChallenges);
-      const firstIncomplete = mappedChallenges.findIndex((c) => c.status !== "completed");
-      const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
-      setCurrentChallengeIndex(initialIndex);
-      if (mappedChallenges[initialIndex]) {
-        setTimeRemaining(mappedChallenges[initialIndex].time_estimate_minutes * 60);
+      // Only hydrate initial index once; subsequent renders must not reset selection
+      if (guestHydratedRoomIdRef.current !== roomId) {
+        guestHydratedRoomIdRef.current = roomId;
+        const mappedChallenges: Challenge[] = guestChallenges.map((c) => ({ ...c }));
+        setChallenges(mappedChallenges);
+        setRoom(guestRoom);
+        const firstIncomplete = mappedChallenges.findIndex((c) => c.status !== "completed");
+        const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+        setCurrentChallengeIndex(initialIndex);
+        if (mappedChallenges[initialIndex]) {
+          setTimeRemaining(mappedChallenges[initialIndex].time_estimate_minutes * 60);
+        }
       }
       setLoading(false);
     } else if (!isGuest && roomId && user) {
@@ -99,34 +112,35 @@ const ChallengePage = () => {
     }
   }, [roomId, user, isGuest, guestRoom]);
 
-  // Keep guest room in sync with local state
-  useEffect(() => {
-    if (isGuest && room) {
-      updateGuestRoom(room);
-    }
-  }, [room]);
+  // NOTE: removed the useEffect that called updateGuestRoom(room) on every room change —
+  // guest room is already updated inside completeChallenge / skipChallenge directly.
 
   // Cleanup interval on unmount
   useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
 
-  const stopInterval = () => {
+  const stopInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  };
+  }, []);
 
-  const startTimer = () => {
-    if (!currentChallenge) return;
+  const startTimer = useCallback(() => {
     stopInterval();
-    const startTime = currentChallenge.time_estimate_minutes * 60;
+    const idx = challengeIndexRef.current;
+    const ch = challengesRef.current[idx];
+    if (!ch) return;
+    const startTime = ch.time_estimate_minutes * 60;
     setTimeRemaining(startTime);
     setTimerActive(true);
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
-        stopInterval();
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
         setTimerActive(false);
         setTimeRemaining(0);
         toast("⏰ Time's up! How did it go?");
@@ -134,12 +148,12 @@ const ChallengePage = () => {
         setTimeRemaining(remaining);
       }
     }, 1000);
-  };
+  }, [stopInterval]);
 
-  const pauseTimer = () => {
+  const pauseTimer = useCallback(() => {
     stopInterval();
     setTimerActive(false);
-  };
+  }, [stopInterval]);
 
   const fetchRoomData = async () => {
     setLoading(true);
@@ -488,12 +502,13 @@ const ChallengePage = () => {
                   </div>
                   <div className="flex justify-center gap-3">
                     {!timerActive ? (
-                      <Button onClick={startTimer} size="lg" className="gap-2">
+                      <Button type="button" onClick={startTimer} size="lg" className="gap-2">
                         <Play className="w-5 h-5" />
                         Start Timer
                       </Button>
                     ) : (
                       <Button
+                        type="button"
                         onClick={pauseTimer}
                         variant="outline"
                         size="lg"
