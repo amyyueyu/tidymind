@@ -25,6 +25,7 @@ interface GuestModeContextValue {
   isGuest: boolean;
   guestRoom: GuestRoom | null;
   guestChallenges: GuestChallenge[];
+  startGuestMode: () => void;
   setGuestSession: (room: GuestRoom, challenges: GuestChallenge[]) => void;
   updateGuestChallenge: (id: string, updates: Partial<GuestChallenge>) => void;
   updateGuestRoom: (updates: Partial<GuestRoom>) => void;
@@ -40,6 +41,14 @@ export const GuestModeProvider = ({ children }: { children: ReactNode }) => {
   const [guestRoom, setGuestRoom] = useState<GuestRoom | null>(null);
   const [guestChallenges, setGuestChallenges] = useState<GuestChallenge[]>([]);
   const [sessionUsed, setSessionUsed] = useState(false);
+
+  const startGuestMode = () => {
+    setIsGuest(true);
+    sessionStorage.setItem("guestMode", "true");
+    setGuestRoom(null);
+    setGuestChallenges([]);
+    setSessionUsed(false);
+  };
 
   const setGuestSession = (room: GuestRoom, challenges: GuestChallenge[]) => {
     setIsGuest(true);
@@ -71,6 +80,7 @@ export const GuestModeProvider = ({ children }: { children: ReactNode }) => {
       isGuest,
       guestRoom,
       guestChallenges,
+      startGuestMode,
       setGuestSession,
       updateGuestChallenge,
       updateGuestRoom,
