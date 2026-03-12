@@ -43,7 +43,7 @@ interface Challenge {
 interface Room {
   id: string;
   name: string;
-  before_image_url: string;
+  before_image_url?: string;
   after_image_url: string | null;
   intent: string;
   total_challenges: number;
