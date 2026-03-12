@@ -60,10 +60,10 @@ import afterBedroom from "@/assets/after-bedroom.jpg";
         
         <div className="relative z-10 max-w-2xl w-full space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold text-foreground">See the Transformations</h2>
-            <p className="text-muted-foreground">From overwhelm to calm, one micro-challenge at a time</p>
-           </div>
+           <div className="text-center space-y-2">
+             <h2 className="text-2xl font-bold text-foreground">See the Transformations</h2>
+             <p className="text-muted-foreground">Your AI body-doubling companion for ADHD</p>
+            </div>
           
           {/* Before/After Showcase - Two Rooms */}
           <div className="space-y-5">
