@@ -61,8 +61,21 @@ const Index = () => {
 
   if (!user || !profile) return null;
 
-  const levelProgress = (profile.total_points % 100);
-  const pointsToNextLevel = 100 - levelProgress;
+  const greetings = [
+    "No pressure. Even 10 minutes counts.",
+    "Your space, your pace.",
+    "Let's just make it a tiny bit better.",
+    "You showed up. That's the hard part.",
+    "Small wins are still wins.",
+  ];
+  const greeting = useMemo(() => greetings[Math.floor(Math.random() * greetings.length)], []);
+
+  const streakMessage =
+    profile.current_streak === 0
+      ? "Every journey starts somewhere. Today's a good day."
+      : profile.current_streak <= 3
+      ? "You're building something real."
+      : "Look at you showing up consistently. 🔥";
 
   return (
     <div className="min-h-screen bg-background">
