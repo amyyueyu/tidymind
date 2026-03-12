@@ -173,8 +173,14 @@ const Capture = () => {
       const response = await supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
       });
-      if (response.error) {
-        toast.error("Couldn't generate vision, but your challenges are ready!");
+      // 429 or other soft errors: don't crash, just skip vision
+      if (response.error || response.data?.error) {
+        const msg = response.data?.error || response.error?.message || "";
+        if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
+          toast("Vision generation is busy right now — your challenges are ready! 🎉 Try viewing the vision later.");
+        } else {
+          toast("Couldn't generate vision, but your challenges are ready!");
+        }
         return;
       }
       const generated = response.data?.imageUrl;
@@ -185,6 +191,7 @@ const Capture = () => {
       }
     } catch (error) {
       console.error("Vision generation error:", error);
+      toast("Couldn't generate vision, but your challenges are ready!");
     } finally {
       setGeneratingVision(false);
     }
@@ -198,8 +205,13 @@ const Capture = () => {
       const response = await supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
       });
-      if (response.error) {
-        toast.error("Couldn't generate vision, but your challenges are ready!");
+      if (response.error || response.data?.error) {
+        const msg = response.data?.error || response.error?.message || "";
+        if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
+          toast("Vision generation is busy — your challenges are ready! Try again in a moment.");
+        } else {
+          toast("Couldn't generate vision, but your challenges are ready!");
+        }
         return;
       }
       const generated = response.data?.imageUrl;
@@ -209,6 +221,7 @@ const Capture = () => {
       }
     } catch (error) {
       console.error("Vision generation error:", error);
+      toast("Couldn't generate vision, but your challenges are ready!");
     } finally {
       setGeneratingVision(false);
     }
