@@ -12,7 +12,7 @@ import beforeRoom from "@/assets/before-room.jpg";
 import afterRoom from "@/assets/after-room.jpg";
 import beforeBedroom from "@/assets/before-bedroom.jpg";
 import afterBedroom from "@/assets/after-bedroom.jpg";
- 
+
 const Auth = () => {
   const navigate = useNavigate();
   const { startGuestMode, clearGuestSession } = useGuestMode();
@@ -26,40 +26,40 @@ const Auth = () => {
     startGuestMode();
     navigate("/capture");
   };
- 
-   const handleSubmit = async (e: React.FormEvent) => {
-     e.preventDefault();
-     setLoading(true);
- 
-     try {
-       if (isLogin) {
-         const { error } = await supabase.auth.signInWithPassword({
-           email,
-           password,
-         });
-          if (error) throw error;
-          toast.success("Welcome back! 🎉");
-          navigate("/");
-       } else {
-         const { error } = await supabase.auth.signUp({
-           email,
-           password,
-           options: {
-             data: { display_name: displayName },
-             emailRedirectTo: window.location.origin,
-           },
-         });
-         if (error) throw error;
-         toast.success("Check your email to confirm your account!");
-       }
-     } catch (error: any) {
-       toast.error(error.message || "Something went wrong");
-     } finally {
-       setLoading(false);
-     }
-   };
- 
-   return (
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (error) throw error;
+        toast.success("Welcome back! 🎉");
+        navigate("/");
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { display_name: displayName },
+            emailRedirectTo: window.location.origin
+          }
+        });
+        if (error) throw error;
+        toast.success("Check your email to confirm your account!");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       {/* Left Side - Showcase */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/5 via-primary/10 to-accent/10 p-8 items-center justify-center relative overflow-hidden">
@@ -69,7 +69,7 @@ const Auth = () => {
           {/* Header */}
            <div className="text-center space-y-2">
              <h2 className="text-2xl font-bold text-foreground">See the Transformations</h2>
-             <p className="text-muted-foreground">Your AI body-doubling companion for ADHD</p>
+             
             </div>
           
           {/* Before/After Showcase - Two Rooms */}
@@ -79,11 +79,11 @@ const Auth = () => {
               <h3 className="text-xs font-medium text-muted-foreground">Living Room</h3>
               <div className="flex items-center gap-3">
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-border/50">
-                  <img 
-                    src={beforeRoom} 
-                    alt="Cluttered living room" 
-                    className="w-full aspect-[4/3] object-cover"
-                  />
+                  <img
+                    src={beforeRoom}
+                    alt="Cluttered living room"
+                    className="w-full aspect-[4/3] object-cover" />
+                  
                   <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
                     Before
                   </div>
@@ -92,11 +92,11 @@ const Auth = () => {
                   <ArrowRight className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-primary/30">
-                  <img 
-                    src={afterRoom} 
-                    alt="Organized living room" 
-                    className="w-full aspect-[4/3] object-cover"
-                  />
+                  <img
+                    src={afterRoom}
+                    alt="Organized living room"
+                    className="w-full aspect-[4/3] object-cover" />
+                  
                   <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-1 rounded-full flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" />
                     After
@@ -110,11 +110,11 @@ const Auth = () => {
               <h3 className="text-xs font-medium text-muted-foreground">Bedroom</h3>
               <div className="flex items-center gap-3">
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-border/50">
-                  <img 
-                    src={beforeBedroom} 
-                    alt="Cluttered bedroom" 
-                    className="w-full aspect-[4/3] object-cover"
-                  />
+                  <img
+                    src={beforeBedroom}
+                    alt="Cluttered bedroom"
+                    className="w-full aspect-[4/3] object-cover" />
+                  
                   <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
                     Before
                   </div>
@@ -123,11 +123,11 @@ const Auth = () => {
                   <ArrowRight className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-primary/30">
-                  <img 
-                    src={afterBedroom} 
-                    alt="Organized bedroom" 
-                    className="w-full aspect-[4/3] object-cover"
-                  />
+                  <img
+                    src={afterBedroom}
+                    alt="Organized bedroom"
+                    className="w-full aspect-[4/3] object-cover" />
+                  
                   <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-1 rounded-full flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" />
                     After
@@ -158,15 +158,15 @@ const Auth = () => {
             <p className="text-xs font-semibold text-primary uppercase tracking-wide">When you create an account</p>
             <ul className="space-y-2">
               {[
-                "📈 Track your streak and watch your habit grow",
-                "🏆 Earn points and level up as you go",
-                "📸 Save every before & after — your visual record",
-                "🔁 Pick up exactly where you left off, every time",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
+              "📈 Track your streak and watch your habit grow",
+              "🏆 Earn points and level up as you go",
+              "📸 Save every before & after — your visual record",
+              "🔁 Pick up exactly where you left off, every time"].
+              map((item) =>
+              <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
                   <span>{item}</span>
                 </li>
-              ))}
+              )}
             </ul>
           </div>
          </div>
@@ -212,26 +212,26 @@ const Auth = () => {
                 {isLogin ? "Welcome back" : "Get started"}
               </CardTitle>
               <CardDescription className="text-center">
-                {isLogin
-                  ? "Sign in to continue your journey"
-                  : "Create an account to start decluttering"}
+                {isLogin ?
+                "Sign in to continue your journey" :
+                "Create an account to start decluttering"}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin && (
-                  <div className="space-y-2">
+                {!isLogin &&
+                <div className="space-y-2">
                     <Label htmlFor="displayName">Display Name</Label>
                     <Input
-                      id="displayName"
-                      type="text"
-                      placeholder="What should we call you?"
-                      value={displayName}
-                      onChange={(e) => setDisplayName(e.target.value)}
-                      className="h-12"
-                    />
+                    id="displayName"
+                    type="text"
+                    placeholder="What should we call you?"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="h-12" />
+                  
                   </div>
-                )}
+                }
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -241,8 +241,8 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-12"
-                  />
+                    className="h-12" />
+                  
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
@@ -254,25 +254,25 @@ const Auth = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
-                    className="h-12"
-                  />
+                    className="h-12" />
+                  
                 </div>
                 <Button
                   type="submit"
                   className="w-full h-12 text-base font-medium"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="flex items-center gap-2">
+                  disabled={loading}>
+                  
+                  {loading ?
+                  <span className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       {isLogin ? "Signing in..." : "Creating account..."}
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
+                    </span> :
+
+                  <span className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" />
                       {isLogin ? "Sign in" : "Create account"}
                     </span>
-                  )}
+                  }
                 </Button>
 
                 <div className="relative">
@@ -288,8 +288,8 @@ const Auth = () => {
                   type="button"
                   variant="outline"
                   className="w-full h-12 text-base font-medium border-primary/40 text-primary hover:bg-primary/5 hover:text-primary hover:border-primary gap-2"
-                  onClick={handleGuestMode}
-                >
+                  onClick={handleGuestMode}>
+                  
                   <Sparkles className="w-4 h-4" />
                   Try it without logging in
                 </Button>
@@ -299,11 +299,11 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setIsLogin(!isLogin)}
-                  className="text-sm text-muted-foreground hover:text-primary transition-colors"
-                >
-                  {isLogin
-                    ? "Don't have an account? Sign up"
-                    : "Already have an account? Sign in"}
+                  className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                  
+                  {isLogin ?
+                  "Don't have an account? Sign up" :
+                  "Already have an account? Sign in"}
                 </button>
               </div>
             </CardContent>
@@ -314,8 +314,8 @@ const Auth = () => {
           </p>
         </div>
        </div>
-     </div>
-   );
- };
- 
- export default Auth;
+     </div>);
+
+};
+
+export default Auth;
