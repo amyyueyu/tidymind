@@ -70,8 +70,11 @@ const Index = () => {
   ];
   const greeting = useMemo(() => greetings[Math.floor(Math.random() * greetings.length)], []);
 
+  const levelProgress = (profile?.total_points ?? 0) % 100;
+  const pointsToNextLevel = 100 - levelProgress;
+
   const streakMessage =
-    profile.current_streak === 0
+    !profile || profile.current_streak === 0
       ? "Every journey starts somewhere. Today's a good day."
       : profile.current_streak <= 3
       ? "You're building something real."
