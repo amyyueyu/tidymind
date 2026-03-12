@@ -157,35 +157,43 @@ const ChallengePage = () => {
 
   const fetchRoomData = async () => {
     setLoading(true);
-    const { data: roomData, error: roomError } = await supabase
-      .from("rooms")
-      .select("*")
-      .eq("id", roomId)
-      .single();
-
-    if (roomError) {
-      toast.error("Room not found");
-      navigate("/");
-      return;
-    }
-    setRoom(roomData);
-
-    const { data: challengeData } = await supabase
-      .from("challenges")
-      .select("*")
-      .eq("room_id", roomId)
-      .order("sort_order", { ascending: true });
-
-    if (challengeData) {
-      setChallenges(challengeData);
-      const firstIncomplete = challengeData.findIndex((c) => c.status !== "completed");
-      const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
-      setCurrentChallengeIndex(initialIndex);
-      if (challengeData[initialIndex]) {
-        setTimeRemaining(challengeData[initialIndex].time_estimate_minutes * 60);
+    try {
+      let roomData = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { data } = await supabase
+          .from("rooms")
+          .select("*")
+          .eq("id", roomId)
+          .maybeSingle();
+        if (data) { roomData = data; break; }
+        if (attempt < 2) await new Promise((r) => setTimeout(r, 700));
       }
+
+      if (!roomData) {
+        toast.error("Room not found. Please try again.");
+        navigate("/");
+        return;
+      }
+      setRoom(roomData);
+
+      const { data: challengeData } = await supabase
+        .from("challenges")
+        .select("*")
+        .eq("room_id", roomId)
+        .order("sort_order", { ascending: true });
+
+      if (challengeData) {
+        setChallenges(challengeData);
+        const firstIncomplete = challengeData.findIndex((c) => c.status !== "completed");
+        const initialIndex = firstIncomplete >= 0 ? firstIncomplete : 0;
+        setCurrentChallengeIndex(initialIndex);
+        if (challengeData[initialIndex]) {
+          setTimeRemaining(challengeData[initialIndex].time_estimate_minutes * 60);
+        }
+      }
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const currentChallenge = challenges[currentChallengeIndex];
