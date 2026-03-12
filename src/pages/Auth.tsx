@@ -176,9 +176,9 @@ import afterBedroom from "@/assets/after-bedroom.jpg";
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Leaf className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">TidyMind</h1>
+            <h1 className="text-3xl font-bold text-foreground">TidyMate</h1>
             <p className="text-muted-foreground mt-2">
-              Transform chaos into calm, one challenge at a time
+              Your AI body-doubling companion for ADHD
             </p>
           </div>
 
