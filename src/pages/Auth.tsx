@@ -152,6 +152,23 @@ const Auth = () => {
               <div className="text-xs text-muted-foreground">Friendly</div>
             </div>
           </div>
+
+          {/* Account benefits nudge */}
+          <div className="rounded-xl bg-background/60 backdrop-blur-sm border border-primary/20 p-4 space-y-2.5">
+            <p className="text-xs font-semibold text-primary uppercase tracking-wide">When you create an account</p>
+            <ul className="space-y-2">
+              {[
+                "📈 Track your streak and watch your habit grow",
+                "🏆 Earn points and level up as you go",
+                "📸 Save every before & after — your visual record",
+                "🔁 Pick up exactly where you left off, every time",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
          </div>
       </div>
  
