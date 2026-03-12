@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Capture from "./pages/Capture";
 import Challenge from "./pages/Challenge";
 import Demo from "./pages/Demo";
+import Stats from "./pages/Stats";
 
 const queryClient = new QueryClient();
 
