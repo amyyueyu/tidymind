@@ -14,7 +14,6 @@ import {
   CartesianGrid,
 } from "recharts";
 import {
-  Leaf,
   ArrowLeft,
   Upload,
   CheckCircle2,
@@ -23,6 +22,7 @@ import {
   Layers,
   Trophy,
 } from "lucide-react";
+import logoIcon from "@/assets/logo-icon.png";
 
 type DailyRow = { day: string; uploads: number; completions: number };
 
@@ -136,7 +136,7 @@ const Stats = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <Leaf className="w-5 h-5 text-primary" />
+          <img src={logoIcon} alt="TidyMate" className="w-5 h-5" />
           <span className="font-semibold text-lg">Analytics</span>
         </div>
       </header>

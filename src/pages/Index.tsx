@@ -13,11 +13,12 @@ import {
   Star, 
   Trophy, 
   LogOut,
-  Leaf,
   ArrowRight,
   Sparkles,
   BarChart2
 } from "lucide-react";
+import logoFull from "@/assets/logo-full.png";
+import logoIcon from "@/assets/logo-icon.png";
 
 const GREETINGS = [
   "No pressure. Even 10 minutes counts.",
@@ -62,7 +63,7 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Leaf className="w-12 h-12 text-primary mx-auto animate-gentle-bounce" />
+          <img src={logoIcon} alt="TidyMate" className="w-12 h-12 mx-auto animate-gentle-bounce" />
           <p className="mt-4 text-muted-foreground">Loading your space...</p>
         </div>
       </div>
@@ -87,8 +88,7 @@ const Index = () => {
       <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Leaf className="w-6 h-6 text-primary" />
-            <span className="font-semibold text-lg">TidyMate</span>
+            <img src={logoFull} alt="TidyMate" className="h-7" />
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" onClick={() => navigate("/stats")}>

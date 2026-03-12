@@ -8,22 +8,23 @@ import { useState, useRef } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import VisionComparison from "@/components/VisionComparison";
 import { supabase } from "@/integrations/supabase/client";
- import {
-   ArrowLeft,
+import {
+  ArrowLeft,
   Camera,
-   CheckCircle2,
-   Circle,
-   Clock,
-   Eye,
-   FastForward,
+  CheckCircle2,
+  Circle,
+  Clock,
+  Eye,
+  FastForward,
   ImagePlus,
-  Leaf,
-   Pause,
-   Play,
-   Sparkles,
-   Star,
-   UserPlus,
- } from "lucide-react";
+  Pause,
+  Play,
+  Sparkles,
+  Star,
+  UserPlus,
+} from "lucide-react";
+import logoIcon from "@/assets/logo-icon.png";
+import logoFull from "@/assets/logo-full.png";
  import { toast } from "@/components/ui/sonner";
  
 interface Challenge {
@@ -213,10 +214,10 @@ type DemoStep = "capture" | "analyzing" | "challenges" | "complete";
 
         <main className="container max-w-2xl mx-auto px-4 py-8">
           <div className="text-center mb-8 animate-fade-in">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Leaf className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center mb-4">
+              <img src={logoFull} alt="TidyMate" className="h-14" />
             </div>
-            <h1 className="text-2xl font-bold mb-2">Try TidyMind Free</h1>
+            <h1 className="text-2xl font-bold mb-2">Try TidyMate Free</h1>
             <p className="text-muted-foreground">
               Capture one space and see how AI creates personalized challenges for you
             </p>
@@ -317,8 +318,7 @@ type DemoStep = "capture" | "analyzing" | "challenges" | "complete";
           <div className="container max-w-2xl mx-auto px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Leaf className="w-5 h-5 text-primary" />
-                <span className="font-semibold">TidyMind</span>
+                <img src={logoFull} alt="TidyMate" className="h-6" />
               </div>
               <div className="flex items-center gap-1 text-points">
                 <Star className="w-4 h-4" />
@@ -377,8 +377,7 @@ type DemoStep = "capture" | "analyzing" | "challenges" | "complete";
          <div className="container max-w-2xl mx-auto px-4 py-3">
            <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Leaf className="w-5 h-5 text-primary" />
-              <span className="font-semibold">TidyMind</span>
+              <img src={logoFull} alt="TidyMate" className="h-6" />
             </div>
              <Badge variant="secondary" className="bg-primary/10 text-primary">
                <Sparkles className="w-3 h-3 mr-1" />
