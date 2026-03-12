@@ -93,7 +93,6 @@ const ChallengePage = () => {
   // Load room data — guest branch only runs ONCE per roomId via ref gate
   useEffect(() => {
     if (isGuest && guestRoom && roomId === guestRoom.id) {
-      // Only hydrate initial index once; subsequent renders must not reset selection
       if (guestHydratedRoomIdRef.current !== roomId) {
         guestHydratedRoomIdRef.current = roomId;
         const mappedChallenges: Challenge[] = guestChallenges.map((c) => ({ ...c }));
@@ -106,11 +105,20 @@ const ChallengePage = () => {
           setTimeRemaining(mappedChallenges[initialIndex].time_estimate_minutes * 60);
         }
       }
-      setLoading(false);
     } else if (!isGuest && roomId && user) {
       fetchRoomData();
     }
   }, [roomId, user, isGuest, guestRoom]);
+
+  // Safety timeout — if still loading after 12s, force-clear it
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => {
+      setLoading(false);
+      toast.error("Taking too long. Please try again.");
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   // NOTE: removed the useEffect that called updateGuestRoom(room) on every room change —
   // guest room is already updated inside completeChallenge / skipChallenge directly.
