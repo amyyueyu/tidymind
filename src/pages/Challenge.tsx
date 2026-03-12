@@ -489,7 +489,7 @@ const ChallengePage = () => {
                       </Button>
                     ) : (
                       <Button
-                        onClick={() => setTimerActive(false)}
+                        onClick={pauseTimer}
                         variant="outline"
                         size="lg"
                         className="gap-2"
