@@ -247,6 +247,7 @@ const ChallengePage = () => {
 
   const skipChallenge = async () => {
     if (!currentChallenge) return;
+    stopInterval();
     setTimerActive(false);
 
     if (isGuest) {
