@@ -13,7 +13,6 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { ShieldOff } from "lucide-react";
 import {
   Leaf,
   ArrowLeft,
@@ -24,6 +23,7 @@ import {
   Layers,
   Trophy,
   ArrowDown,
+  ShieldOff,
 } from "lucide-react";
 
 type DailyRow = { day: string; uploads: number; completions: number };
