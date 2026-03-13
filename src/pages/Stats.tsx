@@ -119,7 +119,20 @@ const Stats = () => {
       ? Math.round((stats.total_completed_challenges / stats.total_uploads) * 10) / 10
       : 0;
 
-  if (loading) return null;
+  if (loading || isAdmin === null) return null;
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 text-center px-4">
+        <ShieldOff className="w-10 h-10 text-muted-foreground" />
+        <h1 className="text-xl font-semibold">Access Restricted</h1>
+        <p className="text-muted-foreground text-sm max-w-xs">
+          This page is only available to the app owner.
+        </p>
+        <Button variant="outline" onClick={() => navigate("/")}>Go home</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
