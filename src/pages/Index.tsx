@@ -31,7 +31,6 @@ const Index = () => {
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const greeting = useMemo(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)], []);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       fetchActiveRooms();
-      supabase.rpc("is_admin").then(({ data }) => setIsAdmin(!!data));
     }
   }, [user]);
 
