@@ -205,6 +205,7 @@ const Capture = () => {
   const generateVision = async (image: string, selectedIntent: string, currentRoomId: string) => {
     setGeneratingVision(true);
     setShowVision(true);
+    analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
       const response = await supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
@@ -223,6 +224,7 @@ const Capture = () => {
       if (generated) {
         setVisionImage(generated);
         await supabase.from("rooms").update({ after_image_url: generated }).eq("id", currentRoomId);
+        analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
     } catch (error) {
