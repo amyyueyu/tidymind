@@ -28,6 +28,17 @@ const Auth = () => {
     navigate("/capture");
   };
 
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    const { error } = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (error) {
+      toast.error("Google sign-in failed. Please try again.");
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
