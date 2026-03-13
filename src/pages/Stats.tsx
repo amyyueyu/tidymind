@@ -13,6 +13,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import { ShieldOff } from "lucide-react";
 import {
   Leaf,
   ArrowLeft,
