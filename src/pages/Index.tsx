@@ -16,7 +16,6 @@ import {
   Leaf,
   ArrowRight,
   Sparkles,
-  BarChart2
 } from "lucide-react";
 
 const GREETINGS = [
