@@ -29,6 +29,7 @@ import {
 import VisionComparison from "@/components/VisionComparison";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { analytics } from "@/lib/analytics";
 
 interface Challenge {
   id: string;
@@ -206,9 +207,14 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
 
-
     const newCompletedCount = completedCount + 1;
     const isLast = currentChallengeIndex === challenges.length - 1;
+
+    // Track task completion
+    analytics.taskCompleted({
+      room_type: room.intent,
+      tasks_completed: newCompletedCount,
+    });
 
     if (isGuest) {
       // Guest: update context only
@@ -252,6 +258,7 @@ const ChallengePage = () => {
     }
 
     if (isLast) {
+      analytics.roomFinished({ room_type: room.intent, tasks_completed: newCompletedCount });
       toast.success("🏆 Amazing! You've completed all challenges!");
       setSessionComplete(true);
     } else {

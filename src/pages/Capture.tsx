@@ -17,6 +17,7 @@ import {
   Trash2,
   Palette,
 } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 type Intent = "tidy" | "declutter" | "redesign";
 
@@ -62,6 +63,7 @@ const Capture = () => {
       const reader = new FileReader();
       reader.onload = (ev) => {
         setImagePreview(ev.target?.result as string);
+        analytics.photoUploaded({ room_type: intent });
       };
       reader.readAsDataURL(file);
     }
@@ -203,6 +205,7 @@ const Capture = () => {
   const generateVision = async (image: string, selectedIntent: string, currentRoomId: string) => {
     setGeneratingVision(true);
     setShowVision(true);
+    analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
       const response = await supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
@@ -221,6 +224,7 @@ const Capture = () => {
       if (generated) {
         setVisionImage(generated);
         await supabase.from("rooms").update({ after_image_url: generated }).eq("id", currentRoomId);
+        analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
     } catch (error) {
@@ -235,6 +239,7 @@ const Capture = () => {
   const generateVisionGuest = async (image: string, selectedIntent: string) => {
     setGeneratingVision(true);
     setShowVision(true);
+    analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
       const response = await supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
@@ -251,6 +256,7 @@ const Capture = () => {
       const generated = response.data?.imageUrl;
       if (generated) {
         setVisionImage(generated);
+        analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
     } catch (error) {

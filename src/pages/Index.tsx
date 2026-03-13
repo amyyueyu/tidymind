@@ -3,6 +3,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { analytics } from "@/lib/analytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -32,6 +33,10 @@ const Index = () => {
   const navigate = useNavigate();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
   const greeting = useMemo(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)], []);
+
+  useEffect(() => {
+    analytics.landingView();
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -181,7 +186,7 @@ const Index = () => {
               <Card 
                 key={room.id} 
                 className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-all"
-                onClick={() => navigate(`/challenge/${room.id}`)}
+                onClick={() => { analytics.challengeStarted({ room_type: room.intent, tasks_completed: room.completed_challenges }); navigate(`/challenge/${room.id}`); }}
               >
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
