@@ -246,6 +246,7 @@ export type Database = {
       }
       get_daily_activity: { Args: { p_days?: number }; Returns: Json }
       get_platform_stats: { Args: never; Returns: Json }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

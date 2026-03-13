@@ -23,6 +23,7 @@ import {
   Layers,
   Trophy,
   ArrowDown,
+  ShieldOff,
 } from "lucide-react";
 
 type DailyRow = { day: string; uploads: number; completions: number };
@@ -44,6 +45,7 @@ const Stats = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
 
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<PlatformStats>({
     total_users: 0,
     users_uploaded: 0,
@@ -66,7 +68,10 @@ const Stats = () => {
 
   useEffect(() => {
     if (!user) return;
-    fetchStats();
+    supabase.rpc("is_admin").then(({ data }) => {
+      setIsAdmin(!!data);
+      if (data) fetchStats();
+    });
   }, [user]);
 
   const fetchStats = async () => {
@@ -114,7 +119,20 @@ const Stats = () => {
       ? Math.round((stats.total_completed_challenges / stats.total_uploads) * 10) / 10
       : 0;
 
-  if (loading) return null;
+  if (loading || isAdmin === null) return null;
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4 text-center px-4">
+        <ShieldOff className="w-10 h-10 text-muted-foreground" />
+        <h1 className="text-xl font-semibold">Access Restricted</h1>
+        <p className="text-muted-foreground text-sm max-w-xs">
+          This page is only available to the app owner.
+        </p>
+        <Button variant="outline" onClick={() => navigate("/")}>Go home</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
