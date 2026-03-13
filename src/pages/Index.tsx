@@ -32,6 +32,7 @@ const Index = () => {
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const greeting = useMemo(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)], []);
 
   useEffect(() => {
@@ -43,6 +44,7 @@ const Index = () => {
   useEffect(() => {
     if (user) {
       fetchActiveRooms();
+      supabase.rpc("is_admin").then(({ data }) => setIsAdmin(!!data));
     }
   }, [user]);
 
@@ -91,9 +93,11 @@ const Index = () => {
             <span className="font-semibold text-lg">TidyMate</span>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={() => navigate("/stats")}>
-              <BarChart2 className="w-5 h-5" />
-            </Button>
+            {isAdmin && (
+              <Button variant="ghost" size="icon" onClick={() => navigate("/stats")}>
+                <BarChart2 className="w-5 h-5" />
+              </Button>
+            )}
             <Button variant="ghost" size="icon" onClick={signOut}>
               <LogOut className="w-5 h-5" />
             </Button>
