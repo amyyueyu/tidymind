@@ -17,6 +17,7 @@ import {
   Trash2,
   Palette,
 } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 type Intent = "tidy" | "declutter" | "redesign";
 

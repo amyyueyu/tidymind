@@ -13,6 +13,7 @@ import beforeRoom from "@/assets/before-room.jpg";
 import afterRoom from "@/assets/after-room.jpg";
 import beforeBedroom from "@/assets/before-bedroom.jpg";
 import afterBedroom from "@/assets/after-bedroom.jpg";
+import { analytics, identifyUser } from "@/lib/analytics";
 
 const Auth = () => {
   const navigate = useNavigate();
