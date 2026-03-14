@@ -657,6 +657,63 @@ const ChallengePage = () => {
               </CardContent>
             </Card>
 
+            {/* Progress Photo — mid session */}
+            <div className="mb-4 animate-fade-in">
+              {!praiseData ? (
+                showProgressUpload ? (
+                  <ProgressPhotoUpload
+                    roomId={roomId!}
+                    roomName={room.name}
+                    intent={room.intent}
+                    beforeImageUrl={room.before_image_url ?? ""}
+                    completedChallenges={completedCount}
+                    totalChallenges={challenges.length}
+                    isGuest={isGuest}
+                    onPraiseReceived={handlePraiseReceived}
+                  />
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-muted-foreground gap-2 border border-dashed border-border hover:border-primary/40 hover:text-foreground"
+                    onClick={() => setShowProgressUpload(true)}
+                  >
+                    <Camera className="w-4 h-4" />
+                    Show my progress
+                  </Button>
+                )
+              ) : (
+                <div className="space-y-3">
+                  <PraiseCard
+                    praise={praiseData.praise}
+                    bonusPoints={praiseData.bonusPoints}
+                    progressLabel={praiseData.progressLabel}
+                    isVisible={true}
+                  />
+                  {!showShareCard ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                      onClick={() => setShowShareCard(true)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Create shareable card
+                    </Button>
+                  ) : (
+                    <ShareCard
+                      beforeImageUrl={room.before_image_url ?? ""}
+                      wipImageUrl={praiseData.wipImageUrl}
+                      shareTagline={praiseData.shareTagline}
+                      sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
+                      roomName={room.name}
+                      roomId={roomId}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className="flex gap-3 animate-fade-in">
               <Button variant="outline" className="flex-1 h-14" onClick={skipChallenge}>
