@@ -89,7 +89,9 @@ Respond ONLY with valid JSON, no markdown, no preamble.
   "praise": "2-3 warm sentences describing what you notice changed. Specific wins only.",
   "bonusPoints": number between 15 and 50 based on how much visible progress was made,
   "progressLabel": "Short celebration label, max 5 words. E.g. Real progress made / Space is breathing / Floor is visible",
-  "shareTagline": "First-person past-tense sentence max 12 words. E.g. I cleared my desk in 20 minutes with TidyMate"
+  "shareTagline": "First-person past-tense sentence max 12 words. E.g. I cleared my desk in 20 minutes with TidyMate",
+  "shareReactionPill": "2-5 words. Punchy, relatable ADHD context. Examples: ADHD win unlocked / this is my Roman Empire / villain arc cancelled / NPC mode deactivated / executive function found / dopamine acquired / chaos tamed temporarily",
+  "shareSub": "Max 12 words. Self-aware, slightly unhinged, funny. First person. Examples: TidyMate made me do it. I did NOT expect that. / Apparently all I needed was an AI holding my hand. / Was ready to move house instead. TidyMate said no. / My therapist will hear about this. / 20 minutes. One brain cell. Zero excuses. NEVER use corporate language. Be the user's inner voice."
 }`;
 
     const userPrompt = `Room: "${roomName}"
