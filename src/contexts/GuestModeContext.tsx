@@ -19,7 +19,6 @@ export interface GuestRoom {
   total_challenges: number;
   completed_challenges: number;
   status: string;
-  wip_image_url?: string | null;
 }
 
 interface GuestModeContextValue {

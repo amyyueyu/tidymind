@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useGuestMode } from "@/contexts/GuestModeContext";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { Camera, Loader2 } from "lucide-react";
@@ -37,7 +36,6 @@ const ProgressPhotoUpload = ({
   onPraiseReceived,
 }: ProgressPhotoUploadProps) => {
   const { user } = useAuth();
-  const { updateGuestRoom } = useGuestMode();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -105,17 +103,11 @@ const ProgressPhotoUpload = ({
         if (error) throw error;
 
         // Save wip_image_url to DB for authenticated users
-        if (!isGuest && user) {
-          const { error: wipErr } = await supabase
+        if (!isGuest && user && storageUrl !== base64) {
+          await supabase
             .from("rooms")
-            .update({ wip_image_url: storageUrl })
+            .update({ wip_image_url: storageUrl } as any)
             .eq("id", roomId);
-          if (wipErr) console.error("Failed to save wip_image_url:", wipErr);
-        }
-
-        // For guests: persist wip_image_url in context so navigating away & back restores the state
-        if (isGuest) {
-          updateGuestRoom({ wip_image_url: storageUrl });
         }
 
         track("progress_photo_uploaded", {
