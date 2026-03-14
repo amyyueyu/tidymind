@@ -88,6 +88,8 @@ const ChallengePage = () => {
     bonusPoints: number;
     progressLabel: string;
     shareTagline: string;
+    shareReactionPill: string;
+    shareSub: string;
     wipImageUrl: string;
   } | null>(null);
   const [showShareCard, setShowShareCard] = useState(false);
@@ -327,9 +329,11 @@ const ChallengePage = () => {
     bonusPoints: number,
     progressLabel: string,
     shareTagline: string,
+    shareReactionPill: string,
+    shareSub: string,
     wipImageUrl: string
   ) => {
-    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, wipImageUrl });
+    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, shareReactionPill, shareSub, wipImageUrl });
     setShowProgressUpload(false);
 
     if (!isGuest && user && roomId) {
@@ -462,6 +466,8 @@ const ChallengePage = () => {
                       beforeImageUrl={room?.before_image_url ?? ""}
                       wipImageUrl={praiseData.wipImageUrl}
                       shareTagline={praiseData.shareTagline}
+                      shareReactionPill={praiseData.shareReactionPill}
+                      shareSub={praiseData.shareSub}
                       sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
                       roomName={room?.name ?? "My Space"}
                       roomId={roomId}
@@ -705,6 +711,8 @@ const ChallengePage = () => {
                       beforeImageUrl={room.before_image_url ?? ""}
                       wipImageUrl={praiseData.wipImageUrl}
                       shareTagline={praiseData.shareTagline}
+                      shareReactionPill={praiseData.shareReactionPill}
+                      shareSub={praiseData.shareSub}
                       sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
                       roomName={room.name}
                       roomId={roomId}

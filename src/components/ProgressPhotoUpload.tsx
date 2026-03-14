@@ -19,6 +19,8 @@ interface ProgressPhotoUploadProps {
     bonusPoints: number,
     progressLabel: string,
     shareTagline: string,
+    shareReactionPill: string,
+    shareSub: string,
     wipImageUrl: string
   ) => void;
 }
@@ -122,6 +124,8 @@ const ProgressPhotoUpload = ({
           result.bonusPoints,
           result.progressLabel,
           result.shareTagline,
+          result.shareReactionPill ?? "ADHD win unlocked",
+          result.shareSub ?? "Something shifted today. Might clean again next year.",
           storageUrl
         );
       } catch (err) {
