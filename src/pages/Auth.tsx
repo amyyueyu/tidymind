@@ -210,19 +210,19 @@ const Auth = () => {
           <div className="lg:hidden mb-6">
             <div className="flex items-center justify-center gap-1.5 mb-4">
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-destructive/30">
-                <img src={beforeRoom} alt="Before" className="w-full h-full object-cover" />
+                <img src={beforeRoom} alt="Before" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <ArrowRight className="w-3 h-3 text-primary" />
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-primary/30">
-                <img src={afterRoom} alt="After" className="w-full h-full object-cover" />
+                <img src={afterRoom} alt="After" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <div className="w-2" />
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-destructive/30">
-                <img src={beforeBedroom} alt="Before" className="w-full h-full object-cover" />
+                <img src={beforeBedroom} alt="Before" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
               <ArrowRight className="w-3 h-3 text-primary" />
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-primary/30">
-                <img src={afterBedroom} alt="After" className="w-full h-full object-cover" />
+                <img src={afterBedroom} alt="After" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
             </div>
           </div>
