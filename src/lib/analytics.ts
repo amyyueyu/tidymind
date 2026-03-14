@@ -33,6 +33,12 @@ export function resetAnalyticsUser() {
   posthog.reset();
 }
 
+// ─── Generic track helper ─────────────────────────────────────────────────────
+
+export function track(event: string, properties?: Record<string, unknown>) {
+  posthog.capture(event, properties);
+}
+
 // ─── Event tracking helpers ───────────────────────────────────────────────────
 
 export const analytics = {
