@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useGuestMode } from "@/contexts/GuestModeContext";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { Camera, Loader2 } from "lucide-react";
