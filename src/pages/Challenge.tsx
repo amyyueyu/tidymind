@@ -25,8 +25,14 @@ import {
   Circle,
   FastForward,
   UserPlus,
+  Camera,
+  Download,
+  Share2,
 } from "lucide-react";
 import VisionComparison from "@/components/VisionComparison";
+import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
+import PraiseCard from "@/components/PraiseCard";
+import ShareCard from "@/components/ShareCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
@@ -74,6 +80,18 @@ const ChallengePage = () => {
   const [loading, setLoading] = useState(true);
   const [showVision, setShowVision] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
+
+  // Progress photo & sharing state
+  const [showProgressUpload, setShowProgressUpload] = useState(false);
+  const [praiseData, setPraiseData] = useState<{
+    praise: string;
+    bonusPoints: number;
+    progressLabel: string;
+    shareTagline: string;
+    wipImageUrl: string;
+  } | null>(null);
+  const [showShareCard, setShowShareCard] = useState(false);
+  const [sessionStartTime] = useState(() => Date.now());
 
   // Refs to avoid stale closures in timer and to gate guest hydration
   const challengesRef = useRef<Challenge[]>([]);
@@ -304,6 +322,30 @@ const ChallengePage = () => {
     setTimeRemaining(challenge.time_estimate_minutes * 60);
   };
 
+  const handlePraiseReceived = async (
+    praise: string,
+    bonusPoints: number,
+    progressLabel: string,
+    shareTagline: string,
+    wipImageUrl: string
+  ) => {
+    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, wipImageUrl });
+    setShowProgressUpload(false);
+
+    if (!isGuest && user && roomId) {
+      try {
+        await supabase.rpc("add_progress_photo_points" as any, {
+          p_room_id: roomId,
+          p_points: bonusPoints,
+        });
+      } catch (err) {
+        console.error("Bonus points RPC error:", err);
+      }
+    }
+
+    toast.success(`+${bonusPoints} bonus points! 🌟`);
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
@@ -368,7 +410,67 @@ const ChallengePage = () => {
               </CardContent>
             </Card>
           ) : (
-            <Button onClick={() => navigate("/")}>Back to Home</Button>
+            <div className="space-y-4 w-full animate-fade-in">
+              {!praiseData ? (
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <p className="text-sm text-muted-foreground text-center">
+                      Capture your transformation — optional but satisfying!
+                    </p>
+                    {showProgressUpload ? (
+                      <ProgressPhotoUpload
+                        roomId={roomId!}
+                        roomName={room?.name ?? "My Space"}
+                        intent={room?.intent ?? "tidy"}
+                        beforeImageUrl={room?.before_image_url ?? ""}
+                        completedChallenges={completedCount}
+                        totalChallenges={challenges.length}
+                        isGuest={false}
+                        onPraiseReceived={handlePraiseReceived}
+                      />
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2"
+                        onClick={() => setShowProgressUpload(true)}
+                      >
+                        <Camera className="w-4 h-4" />
+                        Upload your after photo
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  <PraiseCard
+                    praise={praiseData.praise}
+                    bonusPoints={praiseData.bonusPoints}
+                    progressLabel={praiseData.progressLabel}
+                    isVisible={true}
+                  />
+                  {!showShareCard ? (
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2"
+                      onClick={() => setShowShareCard(true)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Create shareable card
+                    </Button>
+                  ) : (
+                    <ShareCard
+                      beforeImageUrl={room?.before_image_url ?? ""}
+                      wipImageUrl={praiseData.wipImageUrl}
+                      shareTagline={praiseData.shareTagline}
+                      sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
+                      roomName={room?.name ?? "My Space"}
+                      roomId={roomId}
+                    />
+                  )}
+                </div>
+              )}
+              <Button onClick={() => navigate("/")}>Back to Home</Button>
+            </div>
           )}
         </div>
       </div>
@@ -554,6 +656,63 @@ const ChallengePage = () => {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Progress Photo — mid session */}
+            <div className="mb-4 animate-fade-in">
+              {!praiseData ? (
+                showProgressUpload ? (
+                  <ProgressPhotoUpload
+                    roomId={roomId!}
+                    roomName={room.name}
+                    intent={room.intent}
+                    beforeImageUrl={room.before_image_url ?? ""}
+                    completedChallenges={completedCount}
+                    totalChallenges={challenges.length}
+                    isGuest={isGuest}
+                    onPraiseReceived={handlePraiseReceived}
+                  />
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-muted-foreground gap-2 border border-dashed border-border hover:border-primary/40 hover:text-foreground"
+                    onClick={() => setShowProgressUpload(true)}
+                  >
+                    <Camera className="w-4 h-4" />
+                    Show my progress
+                  </Button>
+                )
+              ) : (
+                <div className="space-y-3">
+                  <PraiseCard
+                    praise={praiseData.praise}
+                    bonusPoints={praiseData.bonusPoints}
+                    progressLabel={praiseData.progressLabel}
+                    isVisible={true}
+                  />
+                  {!showShareCard ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full gap-2"
+                      onClick={() => setShowShareCard(true)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Create shareable card
+                    </Button>
+                  ) : (
+                    <ShareCard
+                      beforeImageUrl={room.before_image_url ?? ""}
+                      wipImageUrl={praiseData.wipImageUrl}
+                      shareTagline={praiseData.shareTagline}
+                      sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
+                      roomName={room.name}
+                      roomId={roomId}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 animate-fade-in">
