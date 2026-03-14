@@ -716,7 +716,7 @@ const ChallengePage = () => {
                       variant="outline"
                       size="sm"
                       className="w-full gap-2"
-                      onClick={() => setShowShareCard(true)}
+                      onClick={handleShowShareCard}
                     >
                       <Share2 className="w-4 h-4" />
                       Create shareable card
