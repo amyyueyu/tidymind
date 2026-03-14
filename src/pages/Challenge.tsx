@@ -129,6 +129,18 @@ const ChallengePage = () => {
         if (mappedChallenges[initialIndex]) {
           setTimeRemaining(mappedChallenges[initialIndex].time_estimate_minutes * 60);
         }
+        // Restore praiseData if guest already uploaded a progress photo this session
+        if (guestRoom.wip_image_url) {
+          setPraiseData({
+            praise: "You already made progress on this space. Check out your before and after!",
+            bonusPoints: 0,
+            progressLabel: "Progress saved",
+            shareTagline: "I made real progress with TidyMate.",
+            shareReactionPill: "Progress made",
+            shareSub: "tidymate.app",
+            wipImageUrl: guestRoom.wip_image_url,
+          });
+        }
       }
       setLoading(false);
     } else if (!isGuest && roomId && user) {
