@@ -329,9 +329,11 @@ const ChallengePage = () => {
     bonusPoints: number,
     progressLabel: string,
     shareTagline: string,
+    shareReactionPill: string,
+    shareSub: string,
     wipImageUrl: string
   ) => {
-    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, wipImageUrl });
+    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, shareReactionPill, shareSub, wipImageUrl });
     setShowProgressUpload(false);
 
     if (!isGuest && user && roomId) {
