@@ -322,6 +322,30 @@ const ChallengePage = () => {
     setTimeRemaining(challenge.time_estimate_minutes * 60);
   };
 
+  const handlePraiseReceived = async (
+    praise: string,
+    bonusPoints: number,
+    progressLabel: string,
+    shareTagline: string,
+    wipImageUrl: string
+  ) => {
+    setPraiseData({ praise, bonusPoints, progressLabel, shareTagline, wipImageUrl });
+    setShowProgressUpload(false);
+
+    if (!isGuest && user && roomId) {
+      try {
+        await supabase.rpc("add_progress_photo_points" as any, {
+          p_room_id: roomId,
+          p_points: bonusPoints,
+        });
+      } catch (err) {
+        console.error("Bonus points RPC error:", err);
+      }
+    }
+
+    toast.success(`+${bonusPoints} bonus points! 🌟`);
+  };
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
