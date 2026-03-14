@@ -182,6 +182,8 @@ const ShareCard = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(true);
   const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   // Preload Nunito fonts before drawing
   useEffect(() => {
