@@ -282,8 +282,10 @@ const ChallengePage = () => {
     if (isLast) {
       analytics.roomFinished({ room_type: room.intent, tasks_completed: newCompletedCount });
       toast.success("🏆 Amazing! You've completed all challenges!");
+      showerComplete();
       setSessionComplete(true);
     } else {
+      popChallenge();
       const nextIndex = currentChallengeIndex + 1;
       setCurrentChallengeIndex(nextIndex);
       setTimeRemaining(challenges[nextIndex].time_estimate_minutes * 60);
