@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Share2, Loader2 } from "lucide-react";
+import { Download, Share2, Loader2, Link } from "lucide-react";
 import { track } from "@/lib/analytics";
 
 interface ShareCardProps {
