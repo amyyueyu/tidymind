@@ -474,25 +474,45 @@ const ShareCard = ({
     }, "image/png");
   };
 
+  const handleDownloadAndShare = () => {
+    handleDownload();
+    setShowShareModal(false);
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText("https://tidymate.app");
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
   const handleShare = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || !navigator.share) return;
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const file = new File([blob], "tidymate-progress.png", { type: "image/png" });
+    const shareUrl = "https://tidymate.app";
+    const shareText = shareTagline || "I tidied my space with TidyMate!";
+
+    if (navigator.share) {
       try {
-        await navigator.share({
-          files: [file],
-          title: shareTagline,
-          text: "I used TidyMate to tidy my space! tidymate.app",
-        });
-        track("share_card_shared", { room_id: roomId });
-      } catch (err) {
-        if ((err as Error).name !== "AbortError") {
-          console.error("Share failed:", err);
+        const canvas = canvasRef.current;
+        if (canvas) {
+          const blob = await new Promise<Blob>((resolve) =>
+            canvas.toBlob((b) => resolve(b!), "image/png")
+          );
+          const file = new File([blob], "tidymate-progress.png", { type: "image/png" });
+          await navigator.share({ files: [file], title: shareText, text: shareText, url: shareUrl });
+          track("share_card_shared", { room_id: roomId });
+          return;
+        }
+      } catch {
+        try {
+          await navigator.share({ title: shareText, text: shareText, url: shareUrl });
+          track("share_card_shared", { room_id: roomId });
+          return;
+        } catch {
+          // fall through to modal
         }
       }
-    }, "image/png");
+    }
+
+    setShowShareModal(true);
   };
 
   return (
