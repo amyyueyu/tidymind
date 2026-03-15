@@ -17,12 +17,22 @@ import { analytics, identifyUser } from "@/lib/analytics";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { startGuestMode, clearGuestSession } = useGuestMode();
+  const { startGuestMode } = useGuestMode();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Listen for auth state — navigate as soon as session is confirmed
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        navigate("/", { replace: true });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handleGuestMode = () => {
     startGuestMode();
@@ -46,24 +56,20 @@ const Auth = () => {
 
     try {
       if (isLogin) {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (data.user) {
           identifyUser(data.user.id, { email: data.user.email });
         }
-        toast.success("Welcome back! 🎉");
-        navigate("/");
+        // Navigation handled by onAuthStateChange above — no navigate() here
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { display_name: displayName },
-            emailRedirectTo: window.location.origin
-          }
+            emailRedirectTo: window.location.origin,
+          },
         });
         if (error) throw error;
         if (data.user) {
@@ -74,10 +80,10 @@ const Auth = () => {
           analytics.signupCompleted({ email: data.user.email });
         }
         toast.success("Check your email to confirm your account!");
+        setLoading(false);
       }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
-    } finally {
       setLoading(false);
     }
   };
