@@ -32,6 +32,7 @@ const Capture = () => {
   const [intent, setIntent] = useState<Intent>("tidy");
   const [analyzing, setAnalyzing] = useState(false);
   const [generatingVision, setGeneratingVision] = useState(false);
+  const [visionLoadingTooLong, setVisionLoadingTooLong] = useState(false);
   const [visionImage, setVisionImage] = useState<string | null>(null);
   const [showVision, setShowVision] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
@@ -46,6 +47,17 @@ const Capture = () => {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+
+  // Show escape hatch after 15s of vision loading
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (generatingVision) {
+      timer = setTimeout(() => setVisionLoadingTooLong(true), 15000);
+    } else {
+      setVisionLoadingTooLong(false);
+    }
+    return () => { if (timer) clearTimeout(timer); };
+  }, [generatingVision]);
 
   // If guest tries to start a second session (sessionUsed was set before this page loaded),
   // redirect them to sign up — but ONLY for actual guests (not authenticated users)
@@ -201,18 +213,26 @@ const Capture = () => {
     }
   };
 
+  const VISION_TIMEOUT_MS = 30000;
+
   // Authenticated vision generation (saves to DB)
   const generateVision = async (image: string, selectedIntent: string, currentRoomId: string) => {
     setGeneratingVision(true);
     setShowVision(true);
     analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
-      const response = await supabase.functions.invoke("generate-vision", {
+      type InvokeResult = Awaited<ReturnType<typeof supabase.functions.invoke>>;
+      const invokePromise = supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
       });
+      const timeoutPromise = new Promise<InvokeResult>((_, reject) =>
+        setTimeout(() => reject(new Error("Vision generation timed out")), VISION_TIMEOUT_MS)
+      );
+      const response: InvokeResult = await Promise.race([invokePromise, timeoutPromise]);
+
       // 429 or other soft errors: don't crash, just skip vision
-      if (response.error || response.data?.error) {
-        const msg = response.data?.error || response.error?.message || "";
+      if (response.error || (response.data as any)?.error) {
+        const msg = (response.data as any)?.error || response.error?.message || "";
         if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
           toast("Vision generation is busy right now — your challenges are ready! 🎉 Try viewing the vision later.");
         } else {
@@ -220,16 +240,21 @@ const Capture = () => {
         }
         return;
       }
-      const generated = response.data?.imageUrl;
+      const generated = (response.data as any)?.imageUrl;
       if (generated) {
         setVisionImage(generated);
         await supabase.from("rooms").update({ after_image_url: generated }).eq("id", currentRoomId);
         analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
-    } catch (error) {
-      console.error("Vision generation error:", error);
-      toast("Couldn't generate vision, but your challenges are ready!");
+    } catch (error: any) {
+      if (error?.message === "Vision generation timed out") {
+        console.warn("Vision generation timed out after 30s — falling back gracefully");
+        toast("Vision is taking too long — your challenges are ready! Try vision again later.");
+      } else {
+        console.error("Vision generation error:", error);
+        toast("Couldn't generate vision, but your challenges are ready!");
+      }
     } finally {
       setGeneratingVision(false);
     }
@@ -241,11 +266,17 @@ const Capture = () => {
     setShowVision(true);
     analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
-      const response = await supabase.functions.invoke("generate-vision", {
+      type InvokeResult = Awaited<ReturnType<typeof supabase.functions.invoke>>;
+      const invokePromise = supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
       });
-      if (response.error || response.data?.error) {
-        const msg = response.data?.error || response.error?.message || "";
+      const timeoutPromise = new Promise<InvokeResult>((_, reject) =>
+        setTimeout(() => reject(new Error("Vision generation timed out")), VISION_TIMEOUT_MS)
+      );
+      const response: InvokeResult = await Promise.race([invokePromise, timeoutPromise]);
+
+      if (response.error || (response.data as any)?.error) {
+        const msg = (response.data as any)?.error || response.error?.message || "";
         if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
           toast("Vision generation is busy — your challenges are ready! Try again in a moment.");
         } else {
@@ -253,15 +284,20 @@ const Capture = () => {
         }
         return;
       }
-      const generated = response.data?.imageUrl;
+      const generated = (response.data as any)?.imageUrl;
       if (generated) {
         setVisionImage(generated);
         analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
-    } catch (error) {
-      console.error("Vision generation error:", error);
-      toast("Couldn't generate vision, but your challenges are ready!");
+    } catch (error: any) {
+      if (error?.message === "Vision generation timed out") {
+        console.warn("Vision generation timed out after 30s — falling back gracefully");
+        toast("Vision is taking too long — your challenges are ready! Try vision again later.");
+      } else {
+        console.error("Vision generation error:", error);
+        toast("Couldn't generate vision, but your challenges are ready!");
+      }
     } finally {
       setGeneratingVision(false);
     }
@@ -414,6 +450,26 @@ const Capture = () => {
                         <p className="text-sm text-muted-foreground mt-1">
                           AI is imagining your transformed space
                         </p>
+                        {visionLoadingTooLong && (
+                          <div className="mt-4 space-y-2">
+                            <p className="text-sm text-muted-foreground text-center">
+                              This is taking longer than usual...
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full text-muted-foreground"
+                              onClick={() => {
+                                setGeneratingVision(false);
+                                setShowVision(false);
+                                setVisionLoadingTooLong(false);
+                                toast("Vision skipped — your challenges are ready!");
+                              }}
+                            >
+                              Skip vision, start challenges →
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : visionImage ? (
@@ -432,6 +488,35 @@ const Capture = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Retry card when vision failed silently */}
+            {showVision && !generatingVision && !visionImage && (
+              <Card className="border-0 shadow-sm">
+                <CardContent className="p-4 text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Vision generation didn't complete.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (imagePreview && roomId) {
+                        setVisionImage(null);
+                        setShowVision(true);
+                        if (isGuest) {
+                          generateVisionGuest(imagePreview, intent);
+                        } else {
+                          generateVision(imagePreview, intent, roomId);
+                        }
+                      }
+                    }}
+                  >
+                    Try again
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
 
             <Card className="border-0 shadow-sm bg-accent/30">
               <CardContent className="p-4 text-center">
