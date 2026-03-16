@@ -283,11 +283,12 @@ const ShareCard = ({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const [beforeImg, afterImg, qrDataUrl, logoImg] = await Promise.all([
+      const [beforeImg, afterImg, qrDataUrl, logoImg, wordmarkImg] = await Promise.all([
         loadImageSafe(beforeImageUrl),
         loadImageSafe(wipImageUrl),
         generateQRDataUrl("https://tidymate.app", 120),
         loadImageSafe(tidymateIconSrc),
+        loadImageSafe(tidymateLogoSrc),
       ]);
       if (cancelled) return;
 
@@ -325,7 +326,14 @@ const ShareCard = ({
 
       // ─── 4. Header: logo ─────────────────────────────────────────────────────
       const headerY = cardY + 56;
-      drawLogo(ctx, cardX + cardW / 2 - 80, headerY - 13, 1.4);
+      if (wordmarkImg) {
+        const wmH = 52;
+        const wmAspect = wordmarkImg.naturalWidth / wordmarkImg.naturalHeight;
+        const wmW = wmH * wmAspect;
+        ctx.drawImage(wordmarkImg, CANVAS_W / 2 - wmW / 2, headerY - wmH / 2, wmW, wmH);
+      } else {
+        drawLogo(ctx, cardX + cardW / 2 - 80, headerY - 13, 1.4);
+      }
 
       // ─── 5. Divider line ─────────────────────────────────────────────────────
       const dividerY = headerY + 36;
