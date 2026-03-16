@@ -213,15 +213,24 @@ const Capture = () => {
     }
   };
 
+  const VISION_TIMEOUT_MS = 30000;
+
   // Authenticated vision generation (saves to DB)
   const generateVision = async (image: string, selectedIntent: string, currentRoomId: string) => {
     setGeneratingVision(true);
     setShowVision(true);
     analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
-      const response = await supabase.functions.invoke("generate-vision", {
-        body: { imageUrl: image, intent: selectedIntent },
-      });
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Vision generation timed out")), VISION_TIMEOUT_MS)
+      );
+      const response = await Promise.race([
+        supabase.functions.invoke("generate-vision", {
+          body: { imageUrl: image, intent: selectedIntent },
+        }),
+        timeoutPromise,
+      ]) as Awaited<ReturnType<typeof supabase.functions.invoke>>;
+
       // 429 or other soft errors: don't crash, just skip vision
       if (response.error || response.data?.error) {
         const msg = response.data?.error || response.error?.message || "";
@@ -239,9 +248,14 @@ const Capture = () => {
         analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
-    } catch (error) {
-      console.error("Vision generation error:", error);
-      toast("Couldn't generate vision, but your challenges are ready!");
+    } catch (error: any) {
+      if (error?.message === "Vision generation timed out") {
+        console.warn("Vision generation timed out after 30s — falling back gracefully");
+        toast("Vision is taking too long — your challenges are ready! Try vision again later.");
+      } else {
+        console.error("Vision generation error:", error);
+        toast("Couldn't generate vision, but your challenges are ready!");
+      }
     } finally {
       setGeneratingVision(false);
     }
