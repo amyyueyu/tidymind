@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, Share2, Loader2, Link } from "lucide-react";
 import { track } from "@/lib/analytics";
+import tidymateLogoSrc from "@/assets/tidymate-logo.png";
 
 interface ShareCardProps {
   beforeImageUrl: string;
@@ -281,10 +282,11 @@ const ShareCard = ({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const [beforeImg, afterImg, qrDataUrl] = await Promise.all([
+      const [beforeImg, afterImg, qrDataUrl, logoImg] = await Promise.all([
         loadImageSafe(beforeImageUrl),
         loadImageSafe(wipImageUrl),
         generateQRDataUrl("https://tidymate.app", 120),
+        loadImageSafe(tidymateLogoSrc),
       ]);
       if (cancelled) return;
 
@@ -468,14 +470,21 @@ const ShareCard = ({
       ctx.stroke();
       ctx.restore();
 
-      // Logo (left)
-      drawLogo(ctx, cardX + 52, footerY - 14, 1.1);
+      // Logo (left) — use real image if loaded, fallback to drawn logo
+      const logoH = 38;
+      if (logoImg) {
+        const logoAspect = logoImg.naturalWidth / logoImg.naturalHeight;
+        const logoW = logoH * logoAspect;
+        ctx.drawImage(logoImg, cardX + 48, footerY - logoH / 2, logoW, logoH);
+      } else {
+        drawLogo(ctx, cardX + 48, footerY - 14, 1.1);
+      }
 
-      // tidymate.app URL
-      ctx.font = "600 22px 'Nunito', sans-serif";
-      ctx.fillStyle = "#6A9A70";
-      ctx.textAlign = "left";
-      ctx.fillText("tidymate.app", cardX + 52 + 26 * 1.1 + 96, footerY + 2);
+      // tidymate.app URL — centered
+      ctx.font = "600 24px 'Nunito', sans-serif";
+      ctx.fillStyle = "#5A8A60";
+      ctx.textAlign = "center";
+      ctx.fillText("tidymate.app", CANVAS_W / 2, footerY + 8);
 
       // QR code (right)
       if (qrDataUrl) {
