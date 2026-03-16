@@ -48,6 +48,17 @@ const Capture = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Show escape hatch after 15s of vision loading
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (generatingVision) {
+      timer = setTimeout(() => setVisionLoadingTooLong(true), 15000);
+    } else {
+      setVisionLoadingTooLong(false);
+    }
+    return () => { if (timer) clearTimeout(timer); };
+  }, [generatingVision]);
+
   // If guest tries to start a second session (sessionUsed was set before this page loaded),
   // redirect them to sign up — but ONLY for actual guests (not authenticated users)
   useEffect(() => {
