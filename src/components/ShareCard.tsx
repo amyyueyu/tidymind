@@ -312,7 +312,7 @@ const ShareCard = ({
       ctx.shadowBlur = 48;
       ctx.shadowOffsetY = 16;
       roundRectPath(ctx, cardX, cardY, cardW, cardH, cardR);
-      ctx.fillStyle = "rgba(255, 255, 255, 0.82)";
+      ctx.fillStyle = "#FFFFFF";
       ctx.fill();
       ctx.restore();
 
