@@ -450,6 +450,26 @@ const Capture = () => {
                         <p className="text-sm text-muted-foreground mt-1">
                           AI is imagining your transformed space
                         </p>
+                        {visionLoadingTooLong && (
+                          <div className="mt-4 space-y-2">
+                            <p className="text-sm text-muted-foreground text-center">
+                              This is taking longer than usual...
+                            </p>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="w-full text-muted-foreground"
+                              onClick={() => {
+                                setGeneratingVision(false);
+                                setShowVision(false);
+                                setVisionLoadingTooLong(false);
+                                toast("Vision skipped — your challenges are ready!");
+                              }}
+                            >
+                              Skip vision, start challenges →
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : visionImage ? (
@@ -467,7 +487,35 @@ const Capture = () => {
                   ) : null}
                 </CardContent>
               </Card>
-            )}
+
+              {/* Retry card when vision failed silently */}
+              {showVision && !generatingVision && !visionImage && (
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-4 text-center space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Vision generation didn't complete.
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        if (imagePreview && roomId) {
+                          setVisionImage(null);
+                          setShowVision(true);
+                          if (isGuest) {
+                            generateVisionGuest(imagePreview, intent);
+                          } else {
+                            generateVision(imagePreview, intent, roomId);
+                          }
+                        }
+                      }}
+                    >
+                      Try again
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            
 
             <Card className="border-0 shadow-sm bg-accent/30">
               <CardContent className="p-4 text-center">
