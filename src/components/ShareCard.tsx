@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Download, Share2, Loader2, Link } from "lucide-react";
 import { track } from "@/lib/analytics";
 import tidymateLogoSrc from "@/assets/tidymate-logo.png";
+import tidymateIconSrc from "@/assets/tidymate-icon.png";
 
 interface ShareCardProps {
   beforeImageUrl: string;
@@ -286,7 +287,7 @@ const ShareCard = ({
         loadImageSafe(beforeImageUrl),
         loadImageSafe(wipImageUrl),
         generateQRDataUrl("https://tidymate.app", 120),
-        loadImageSafe(tidymateLogoSrc),
+        loadImageSafe(tidymateIconSrc),
       ]);
       if (cancelled) return;
 
@@ -470,12 +471,10 @@ const ShareCard = ({
       ctx.stroke();
       ctx.restore();
 
-      // Logo (left) — use real image if loaded, fallback to drawn logo
-      const logoH = 38;
+      // Icon logo (left) — square leaf icon
+      const iconSize = 42;
       if (logoImg) {
-        const logoAspect = logoImg.naturalWidth / logoImg.naturalHeight;
-        const logoW = logoH * logoAspect;
-        ctx.drawImage(logoImg, cardX + 48, footerY - logoH / 2, logoW, logoH);
+        ctx.drawImage(logoImg, cardX + 52, footerY - iconSize / 2, iconSize, iconSize);
       } else {
         drawLogo(ctx, cardX + 48, footerY - 14, 1.1);
       }
