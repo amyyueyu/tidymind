@@ -287,7 +287,7 @@ const ShareCard = ({
         loadImageSafe(beforeImageUrl),
         loadImageSafe(wipImageUrl),
         generateQRDataUrl("https://tidymate.app", 120),
-        loadImageSafe(tidymateLogoSrc),
+        loadImageSafe(tidymateIconSrc),
       ]);
       if (cancelled) return;
 
