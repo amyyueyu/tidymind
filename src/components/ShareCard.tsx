@@ -470,14 +470,21 @@ const ShareCard = ({
       ctx.stroke();
       ctx.restore();
 
-      // Logo (left)
-      drawLogo(ctx, cardX + 52, footerY - 14, 1.1);
+      // Logo (left) — use real image if loaded, fallback to drawn logo
+      const logoH = 38;
+      if (logoImg) {
+        const logoAspect = logoImg.naturalWidth / logoImg.naturalHeight;
+        const logoW = logoH * logoAspect;
+        ctx.drawImage(logoImg, cardX + 48, footerY - logoH / 2, logoW, logoH);
+      } else {
+        drawLogo(ctx, cardX + 48, footerY - 14, 1.1);
+      }
 
-      // tidymate.app URL
-      ctx.font = "600 22px 'Nunito', sans-serif";
-      ctx.fillStyle = "#6A9A70";
-      ctx.textAlign = "left";
-      ctx.fillText("tidymate.app", cardX + 52 + 26 * 1.1 + 96, footerY + 2);
+      // tidymate.app URL — centered
+      ctx.font = "600 24px 'Nunito', sans-serif";
+      ctx.fillStyle = "#5A8A60";
+      ctx.textAlign = "center";
+      ctx.fillText("tidymate.app", CANVAS_W / 2, footerY + 8);
 
       // QR code (right)
       if (qrDataUrl) {
