@@ -221,19 +221,18 @@ const Capture = () => {
     setShowVision(true);
     analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
-      const timeoutPromise = new Promise<never>((_, reject) =>
+      type InvokeResult = Awaited<ReturnType<typeof supabase.functions.invoke>>;
+      const invokePromise = supabase.functions.invoke("generate-vision", {
+        body: { imageUrl: image, intent: selectedIntent },
+      });
+      const timeoutPromise = new Promise<InvokeResult>((_, reject) =>
         setTimeout(() => reject(new Error("Vision generation timed out")), VISION_TIMEOUT_MS)
       );
-      const response = await Promise.race([
-        supabase.functions.invoke("generate-vision", {
-          body: { imageUrl: image, intent: selectedIntent },
-        }),
-        timeoutPromise,
-      ]) as Awaited<ReturnType<typeof supabase.functions.invoke>>;
+      const response: InvokeResult = await Promise.race([invokePromise, timeoutPromise]);
 
       // 429 or other soft errors: don't crash, just skip vision
-      if (response.error || response.data?.error) {
-        const msg = response.data?.error || response.error?.message || "";
+      if (response.error || (response.data as any)?.error) {
+        const msg = (response.data as any)?.error || response.error?.message || "";
         if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
           toast("Vision generation is busy right now — your challenges are ready! 🎉 Try viewing the vision later.");
         } else {
@@ -241,7 +240,7 @@ const Capture = () => {
         }
         return;
       }
-      const generated = response.data?.imageUrl;
+      const generated = (response.data as any)?.imageUrl;
       if (generated) {
         setVisionImage(generated);
         await supabase.from("rooms").update({ after_image_url: generated }).eq("id", currentRoomId);
@@ -267,11 +266,17 @@ const Capture = () => {
     setShowVision(true);
     analytics.visionGenerationStarted({ room_type: selectedIntent });
     try {
-      const response = await supabase.functions.invoke("generate-vision", {
+      type InvokeResult = Awaited<ReturnType<typeof supabase.functions.invoke>>;
+      const invokePromise = supabase.functions.invoke("generate-vision", {
         body: { imageUrl: image, intent: selectedIntent },
       });
-      if (response.error || response.data?.error) {
-        const msg = response.data?.error || response.error?.message || "";
+      const timeoutPromise = new Promise<InvokeResult>((_, reject) =>
+        setTimeout(() => reject(new Error("Vision generation timed out")), VISION_TIMEOUT_MS)
+      );
+      const response: InvokeResult = await Promise.race([invokePromise, timeoutPromise]);
+
+      if (response.error || (response.data as any)?.error) {
+        const msg = (response.data as any)?.error || response.error?.message || "";
         if (msg.toLowerCase().includes("rate limit") || msg.toLowerCase().includes("busy")) {
           toast("Vision generation is busy — your challenges are ready! Try again in a moment.");
         } else {
@@ -279,15 +284,20 @@ const Capture = () => {
         }
         return;
       }
-      const generated = response.data?.imageUrl;
+      const generated = (response.data as any)?.imageUrl;
       if (generated) {
         setVisionImage(generated);
         analytics.visionGenerated({ room_type: selectedIntent });
         toast.success("Your vision is ready! ✨");
       }
-    } catch (error) {
-      console.error("Vision generation error:", error);
-      toast("Couldn't generate vision, but your challenges are ready!");
+    } catch (error: any) {
+      if (error?.message === "Vision generation timed out") {
+        console.warn("Vision generation timed out after 30s — falling back gracefully");
+        toast("Vision is taking too long — your challenges are ready! Try vision again later.");
+      } else {
+        console.error("Vision generation error:", error);
+        toast("Couldn't generate vision, but your challenges are ready!");
+      }
     } finally {
       setGeneratingVision(false);
     }
