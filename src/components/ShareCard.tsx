@@ -425,7 +425,7 @@ const ShareCard = ({
       drawArrow(ctx, arrowCX, arrowCY, 52);
 
       // ─── 8. Caption ──────────────────────────────────────────────────────────
-      const captionTop = polaroidTop + totalFrameH + 48;
+      const captionTop = polaroidTop + totalFrameH + 80;
       const captionMaxW = cardW - 200;
 
       ctx.font = "700 36px 'Nunito', sans-serif";
