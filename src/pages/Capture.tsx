@@ -32,6 +32,7 @@ const Capture = () => {
   const [intent, setIntent] = useState<Intent>("tidy");
   const [analyzing, setAnalyzing] = useState(false);
   const [generatingVision, setGeneratingVision] = useState(false);
+  const [visionLoadingTooLong, setVisionLoadingTooLong] = useState(false);
   const [visionImage, setVisionImage] = useState<string | null>(null);
   const [showVision, setShowVision] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
