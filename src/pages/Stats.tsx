@@ -214,23 +214,49 @@ const Stats = () => {
   const fetchData = useCallback(async (days: 7 | 14 | 30) => {
     setDataLoading(true);
     setError(null);
+
+    // Fetch stats independently so a failure in one doesn't block the other
+    let statsErr: string | null = null;
+
     try {
-      const [statsRes, dailyRes] = await Promise.all([
-        supabase.rpc("get_full_platform_stats" as never),
-        supabase.rpc("get_daily_activity_v2" as never, { p_days: days } as never),
-      ]);
-      if (statsRes.error) throw statsRes.error;
-      if (dailyRes.error) throw dailyRes.error;
-      setStats(statsRes.data as FullStats);
-      setDaily((dailyRes.data as DailyRow[]) ?? []);
-      setLastUpdated(new Date());
+      const { data, error: statsError } = await supabase.rpc("get_full_platform_stats" as never);
+      if (statsError) {
+        console.error("get_full_platform_stats failed:", {
+          message: statsError.message,
+          code: statsError.code,
+          details: statsError.details,
+          hint: statsError.hint,
+        });
+        statsErr = `get_full_platform_stats: ${statsError.message || statsError.code || "Unknown"}`;
+      } else {
+        setStats(data as FullStats);
+      }
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Unknown error";
-      console.error("[Stats] fetch error:", e);
-      setError(msg);
-    } finally {
-      setDataLoading(false);
+      console.error("get_full_platform_stats threw:", e);
+      statsErr = `get_full_platform_stats: ${msg}`;
     }
+
+    try {
+      const { data, error: dailyError } = await supabase.rpc("get_daily_activity_v2" as never, { p_days: days } as never);
+      if (dailyError) {
+        console.error("get_daily_activity_v2 failed:", {
+          message: dailyError.message,
+          code: dailyError.code,
+          details: dailyError.details,
+          hint: dailyError.hint,
+        });
+        // Activity failing just shows empty chart, not full page error
+      } else {
+        setDaily((data as DailyRow[]) ?? []);
+      }
+    } catch (e: unknown) {
+      console.error("get_daily_activity_v2 threw:", e);
+    }
+
+    if (statsErr) setError(statsErr);
+    setLastUpdated(new Date());
+    setDataLoading(false);
   }, []);
 
   const handleRangeChange = (days: 7 | 14 | 30) => {
