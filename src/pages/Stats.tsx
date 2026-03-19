@@ -407,7 +407,7 @@ const Stats = () => {
         {error && (
           <div className="flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg text-sm text-destructive">
             <AlertTriangle className="w-5 h-5 shrink-0" />
-            <span>Failed to load analytics. Check backend RPC logs. ({error})</span>
+            <span>Failed to load analytics: {error || "Unknown error"}. Check backend RPC logs.</span>
           </div>
         )}
 
