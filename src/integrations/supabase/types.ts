@@ -371,6 +371,8 @@ export type Database = {
         Returns: number
       }
       get_daily_activity: { Args: { p_days?: number }; Returns: Json }
+      get_daily_activity_v2: { Args: { p_days?: number }; Returns: Json }
+      get_full_platform_stats: { Args: never; Returns: Json }
       get_platform_stats: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       move_to_dlq: {
