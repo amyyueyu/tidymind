@@ -313,9 +313,9 @@ const Capture = () => {
   };
 
   const intentOptions = [
-    { value: "tidy" as Intent, label: "Tidy Up", description: "Put things back in their places", icon: Sparkles },
-    { value: "declutter" as Intent, label: "Declutter", description: "Remove items you don't need", icon: Trash2 },
-    { value: "redesign" as Intent, label: "Redesign", description: "Reorganize for better flow", icon: Palette },
+    { value: "tidy" as Intent, label: t('capture.tidy'), description: t('capture.tidy.sub'), icon: Sparkles },
+    { value: "declutter" as Intent, label: t('capture.declutter'), description: t('capture.declutter.sub'), icon: Trash2 },
+    { value: "redesign" as Intent, label: t('capture.redesign'), description: t('capture.redesign.sub'), icon: Palette },
   ];
 
   if (authLoading) return null;
