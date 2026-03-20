@@ -1056,8 +1056,8 @@ const ChallengePage = () => {
                   className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm bg-primary/10 text-primary border border-primary/25 hover:bg-primary/15 hover:border-primary/40 active:scale-95 transition-all duration-150 mt-1"
                 >
                   <Camera className="w-4 h-4" />
-                  Upload progress photo
-                  <span className="ml-1 text-xs font-normal text-primary/60">· earn bonus pts</span>
+                  {t('challenge.progress.btn')}
+                  <span className="ml-1 text-xs font-normal text-primary/60">{t('challenge.progress.earn')}</span>
                 </button>
               )
             ) : (
