@@ -32,6 +32,7 @@ import {
 
 // Circumference for r=70 SVG ring
 const CIRCUMFERENCE = 2 * Math.PI * 70;
+
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
 import PraiseCard from "@/components/PraiseCard";
