@@ -158,6 +158,7 @@ const ChallengePage = () => {
     const startTime = ch.time_estimate_minutes * 60;
     setTimeRemaining(startTime);
     setTimerActive(true);
+    setChallengeStartTime(Date.now());
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
