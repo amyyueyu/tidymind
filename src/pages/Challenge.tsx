@@ -28,7 +28,7 @@ import {
   Camera,
   Download,
   Share2,
-  Music,
+  Music2,
 } from "lucide-react";
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
@@ -75,15 +75,21 @@ function playEarlyFinishSound() {
 }
 
 // ─── YouTube BGM vibes ──────────────────────────────────────────────────────────
-const MUSIC_VIBES = [
-  { id: "lofi-focus",  label: "lofi focus",  emoji: "🎵", youtubeId: "jfKfPfyJRdk" },
-  { id: "chill-waves", label: "chill waves", emoji: "🌊", youtubeId: "5qap5aO4i9A" },
-  { id: "upbeat",      label: "upbeat",      emoji: "⚡", youtubeId: "DWcJFNfaw9c" },
-  { id: "night-calm",  label: "night calm",  emoji: "🌙", youtubeId: "4oStw0r33so" },
-  { id: "indie-pop",   label: "indie pop",   emoji: "🎸", youtubeId: "HTsL9PWPB6g" },
-] as const;
+const MUSIC_PLAYLISTS: Record<string, string> = {
+  "lofi focus":  "jfKfPfyJRdk",
+  "chill waves": "Na0w3Mz46GA",
+  "upbeat":      "DWcJFNfaw9c",
+  "night calm":  "5qap5aO4i9A",
+  "indie pop":   "NIYcGrJpBPc",
+};
 
-type MusicVibeId = typeof MUSIC_VIBES[number]["id"];
+const VIBE_LABELS: Record<string, string> = {
+  "lofi focus":  "🎵 lofi focus",
+  "chill waves": "🌊 chill waves",
+  "upbeat":      "⚡ upbeat",
+  "night calm":  "🌙 night calm",
+  "indie pop":   "🎸 indie pop",
+};
 
 interface Challenge {
   id: string;
@@ -134,7 +140,9 @@ const ChallengePage = () => {
 
   // Music state
   const [musicOn, setMusicOn] = useState(false);
-  const [musicVibe, setMusicVibe] = useState<MusicVibeId>("lofi-focus");
+  const [musicVibe, setMusicVibe] = useState("lofi focus");
+  const [musicKey, setMusicKey] = useState(0);
+  const musicIframeRef = useRef<HTMLIFrameElement>(null);
 
   // Progress photo & sharing state
   const [showProgressUpload, setShowProgressUpload] = useState(false);
@@ -762,60 +770,65 @@ const ChallengePage = () => {
                     {formatTime(timeRemaining)}
                   </div>
                 {/* Music section — inside timer card */}
-                <div className="bg-muted/40 rounded-2xl p-3 mx-0 mb-4">
-                  {/* Header row: label + toggle */}
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
-                      <Music className="w-3.5 h-3.5" />
-                      Countdown music
+                <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-4 text-left">
+                  {/* Header row */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Music2 className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm font-semibold text-foreground">Countdown music</span>
                     </div>
+                    {/* Custom pill toggle — Bug 1 fix */}
                     <button
-                      onClick={() => setMusicOn((prev) => !prev)}
+                      role="switch"
+                      aria-checked={musicOn}
+                      onClick={() => setMusicOn((v) => !v)}
                       className={cn(
-                        "relative w-10 h-5 rounded-full transition-colors",
-                        musicOn ? "bg-primary" : "bg-muted-foreground/30"
+                        "relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-200 flex-shrink-0 focus-visible:outline-none",
+                        musicOn ? "bg-primary" : "bg-input"
                       )}
                     >
                       <span
                         className={cn(
-                          "absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200",
-                          musicOn ? "translate-x-5" : "translate-x-0.5"
+                          "inline-block h-5 w-5 rounded-full bg-white shadow-sm transform transition-transform duration-200",
+                          musicOn ? "translate-x-6" : "translate-x-1"
                         )}
                       />
                     </button>
                   </div>
 
-                  {musicOn && (
-                    <>
-                      <div className="flex gap-1.5 flex-wrap">
-                        {MUSIC_VIBES.map((vibe) => (
-                          <button
-                            key={vibe.id}
-                            onClick={() => setMusicVibe(vibe.id)}
-                            className={cn(
-                              "flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border-[1.5px] transition-colors",
-                              musicVibe === vibe.id
-                                ? "bg-primary text-primary-foreground border-primary"
-                                : "bg-background text-muted-foreground border-border"
-                            )}
-                          >
-                            <span>{vibe.emoji}</span>
-                            {vibe.label}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-1.5 mt-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse flex-shrink-0" />
-                        <span className="text-[10px] text-primary font-semibold">
-                          {MUSIC_VIBES.find((v) => v.id === musicVibe)?.label}
-                          {" "}· playing while timer runs
-                        </span>
-                      </div>
-                    </>
-                  )}
+                  {/* Vibe pills — always visible so user can preview before starting */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {Object.keys(MUSIC_PLAYLISTS).map((vibe) => (
+                      <button
+                        key={vibe}
+                        onClick={() => {
+                          setMusicVibe(vibe);
+                          setMusicKey((k) => k + 1);
+                          if (!musicOn) setMusicOn(true);
+                        }}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 border",
+                          musicVibe === vibe && musicOn
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background text-muted-foreground border-border hover:border-primary/50"
+                        )}
+                      >
+                        {VIBE_LABELS[vibe]}
+                      </button>
+                    ))}
+                  </div>
 
+                  {/* Status line */}
+                  {musicOn && (
+                    <p className="text-xs text-primary mt-2.5 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block flex-shrink-0" />
+                      {timerActive
+                        ? `${musicVibe} · playing while timer runs`
+                        : `${musicVibe} · will play when timer starts`}
+                    </p>
+                  )}
                   {!musicOn && (
-                    <p className="text-[11px] text-muted-foreground">Add rhythm to your countdown</p>
+                    <p className="text-xs text-muted-foreground mt-2.5">Add rhythm to your countdown</p>
                   )}
                 </div>
 
@@ -923,13 +936,15 @@ const ChallengePage = () => {
               </Button>
             </div>
 
-            {/* Hidden YouTube BGM iframe — only mounted after explicit user opt-in */}
-            {musicOn && (
+            {/* Hidden YouTube BGM iframe — mounted only when music on AND timer active (Bug 3 fix) */}
+            {musicOn && timerActive && (
               <iframe
-                key={musicVibe}
-                src={`https://www.youtube.com/embed/${MUSIC_VIBES.find((v) => v.id === musicVibe)?.youtubeId}?autoplay=1&mute=0`}
-                allow="autoplay"
-                style={{ display: "none" }}
+                key={`music-${musicVibe}-${musicKey}`}
+                ref={musicIframeRef}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}`}
+                allow="autoplay; encrypted-media"
+                allowFullScreen={false}
+                style={{ display: "none", position: "absolute", width: 0, height: 0, border: "none" }}
                 title="background music"
               />
             )}
