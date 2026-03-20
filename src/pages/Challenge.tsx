@@ -272,6 +272,19 @@ const ChallengePage = () => {
     }
   }, []);
 
+  // Send play/pause commands to the YouTube iframe via postMessage
+  // (works after the iframe is unlocked by the initial user-gesture mount)
+  const sendYouTubeCommand = useCallback((func: "playVideo" | "pauseVideo") => {
+    try {
+      musicIframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "command", func, args: [] }),
+        "*"
+      );
+    } catch {
+      // cross-origin errors are safe to ignore
+    }
+  }, []);
+
   const startTimer = useCallback(() => {
     stopInterval();
     const idx = challengeIndexRef.current;
