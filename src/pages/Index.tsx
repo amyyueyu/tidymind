@@ -32,16 +32,17 @@ const Index = () => {
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
+  const [roomsLoaded, setRoomsLoaded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const greeting = useMemo(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)], []);
 
   const isFirstTimeUser = useMemo(() => {
-    if (profileLoading || authLoading) return false;
+    if (profileLoading || authLoading || !roomsLoaded) return false;
     if (!profile) return false;
     if (activeRooms.length > 0) return false;
     if (profile.total_points > 0) return false;
     return true;
-  }, [profile, activeRooms, profileLoading, authLoading]);
+  }, [profile, activeRooms, profileLoading, authLoading, roomsLoaded]);
 
   useEffect(() => {
     analytics.landingView();
@@ -70,10 +71,11 @@ const Index = () => {
       .limit(3);
     
     if (data) setActiveRooms(data);
+    setRoomsLoaded(true);
   };
 
   useEffect(() => {
-    if (!profileLoading && !authLoading && profile && !activeRooms.length) {
+    if (!profileLoading && !authLoading && roomsLoaded && profile && activeRooms.length === 0) {
       const hasSeenOnboarding = localStorage.getItem(
         `tidymate_onboarded_${user?.id}`
       );
@@ -82,7 +84,7 @@ const Index = () => {
         return () => clearTimeout(t);
       }
     }
-  }, [profile, profileLoading, authLoading, activeRooms, user]);
+  }, [profile, profileLoading, authLoading, activeRooms, roomsLoaded, user]);
 
   const handleOnboardingDismiss = (goToCapture: boolean) => {
     localStorage.setItem(`tidymate_onboarded_${user?.id}`, "true");
