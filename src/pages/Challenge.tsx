@@ -75,15 +75,21 @@ function playEarlyFinishSound() {
 }
 
 // ─── YouTube BGM vibes ──────────────────────────────────────────────────────────
-const MUSIC_VIBES = [
-  { id: "lofi-focus",  label: "lofi focus",  emoji: "🎵", youtubeId: "jfKfPfyJRdk" },
-  { id: "chill-waves", label: "chill waves", emoji: "🌊", youtubeId: "5qap5aO4i9A" },
-  { id: "upbeat",      label: "upbeat",      emoji: "⚡", youtubeId: "DWcJFNfaw9c" },
-  { id: "night-calm",  label: "night calm",  emoji: "🌙", youtubeId: "4oStw0r33so" },
-  { id: "indie-pop",   label: "indie pop",   emoji: "🎸", youtubeId: "HTsL9PWPB6g" },
-] as const;
+const MUSIC_PLAYLISTS: Record<string, string> = {
+  "lofi focus":  "jfKfPfyJRdk",
+  "chill waves": "Na0w3Mz46GA",
+  "upbeat":      "DWcJFNfaw9c",
+  "night calm":  "5qap5aO4i9A",
+  "indie pop":   "NIYcGrJpBPc",
+};
 
-type MusicVibeId = typeof MUSIC_VIBES[number]["id"];
+const VIBE_LABELS: Record<string, string> = {
+  "lofi focus":  "🎵 lofi focus",
+  "chill waves": "🌊 chill waves",
+  "upbeat":      "⚡ upbeat",
+  "night calm":  "🌙 night calm",
+  "indie pop":   "🎸 indie pop",
+};
 
 interface Challenge {
   id: string;
