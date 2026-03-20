@@ -242,8 +242,7 @@ const ChallengePage = () => {
   const resumeTimer = useCallback(() => {
     stopInterval();
     setTimerActive(true);
-    let remaining = 0;
-    setTimeRemaining((prev) => { remaining = prev; return prev; });
+    let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
