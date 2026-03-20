@@ -163,10 +163,12 @@ const ChallengePage = () => {
   const challengesRef = useRef<Challenge[]>([]);
   const challengeIndexRef = useRef(0);
   const guestHydratedRoomIdRef = useRef<string | null>(null);
+  const timeRemainingRef = useRef(0);
 
   // Keep refs in sync with state on every render
   challengesRef.current = challenges;
   challengeIndexRef.current = currentChallengeIndex;
+  timeRemainingRef.current = timeRemaining;
 
   // Auth guard
   useEffect(() => {
