@@ -644,9 +644,9 @@ const ChallengePage = () => {
             <Card className="border-0 shadow-lg bg-gradient-to-br from-primary/5 to-primary/10 animate-fade-in">
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <p className="font-semibold text-lg">Save your progress</p>
+                  <p className="font-semibold text-lg">{t('challenge.save.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Create a free account to track your streaks, earn points, and keep your transformation history.
+                    {t('challenge.save.sub')}
                   </p>
                 </div>
                 <Button
@@ -654,13 +654,13 @@ const ChallengePage = () => {
                   onClick={() => navigate("/auth?signup=1")}
                 >
                   <UserPlus className="w-5 h-5" />
-                  Create free account
+                  {t('challenge.create.btn')}
                 </Button>
                 <button
                   className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => navigate("/auth")}
                 >
-                  Sign in instead
+                  {t('challenge.signin.link')}
                 </button>
               </CardContent>
             </Card>
