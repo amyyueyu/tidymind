@@ -24,7 +24,6 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Listen for auth state — navigate as soon as session is confirmed
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
@@ -61,7 +60,6 @@ const Auth = () => {
         if (data.user) {
           identifyUser(data.user.id, { email: data.user.email });
         }
-        // Navigation handled by onAuthStateChange above — no navigate() here
       } else {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -93,14 +91,43 @@ const Auth = () => {
       {/* Left Side - Showcase */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/5 via-primary/10 to-accent/10 p-8 items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-        
+
         <div className="relative z-10 max-w-2xl w-full space-y-6">
-          {/* Header */}
-           <div className="text-center space-y-2">
-             <h2 className="text-2xl font-bold text-foreground">See the Transformations</h2>
-             
-            </div>
-          
+
+          {/* CHANGE 1: New hero headline */}
+          <div className="text-center mb-8 px-4">
+            <h1 className="font-black text-3xl leading-tight text-foreground mb-3">
+              Turns out we don't hate cleaning.
+              <br />
+              <span className="text-primary">We hate starting.</span>
+            </h1>
+            <p className="text-base text-muted-foreground leading-relaxed max-w-sm mx-auto">
+              TidyMate breaks your messy room into tiny,
+              doable tasks — one at a time, no overwhelm.
+              Built for ADHD brains.
+            </p>
+          </div>
+
+          {/* CHANGE 2: Feature pills moved up, bigger */}
+          <div className="flex justify-center gap-3 flex-wrap mb-8 px-4">
+            {[
+              { icon: '⚡', label: '5-min micro-tasks' },
+              { icon: '🧠', label: 'Built for ADHD' },
+              { icon: '✨', label: 'AI-powered plan' },
+            ].map(f => (
+              <div key={f.label}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary">
+                <span className="text-base">{f.icon}</span>
+                {f.label}
+              </div>
+            ))}
+          </div>
+
+          {/* CHANGE 3: Social proof line */}
+          <div className="text-center mb-4">
+            <p className="text-sm text-muted-foreground">Real results from real messy rooms</p>
+          </div>
+
           {/* Before/After Showcase - Two Rooms */}
           <div className="space-y-5">
             {/* Living Room Transformation */}
@@ -114,7 +141,6 @@ const Auth = () => {
                     loading="lazy"
                     decoding="async"
                     className="w-full aspect-[4/3] object-cover" />
-                  
                   <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
                     Before
                   </div>
@@ -129,7 +155,6 @@ const Auth = () => {
                     loading="lazy"
                     decoding="async"
                     className="w-full aspect-[4/3] object-cover" />
-                  
                   <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-1 rounded-full flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" />
                     After
@@ -137,7 +162,7 @@ const Auth = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Bedroom Transformation */}
             <div className="space-y-2">
               <h3 className="text-xs font-medium text-muted-foreground">Bedroom</h3>
@@ -149,7 +174,6 @@ const Auth = () => {
                     loading="lazy"
                     decoding="async"
                     className="w-full aspect-[4/3] object-cover" />
-                  
                   <div className="absolute bottom-2 left-2 bg-destructive/90 text-destructive-foreground text-[10px] font-medium px-2 py-1 rounded-full">
                     Before
                   </div>
@@ -164,7 +188,6 @@ const Auth = () => {
                     loading="lazy"
                     decoding="async"
                     className="w-full aspect-[4/3] object-cover" />
-                  
                   <div className="absolute bottom-2 right-2 bg-primary text-primary-foreground text-[10px] font-medium px-2 py-1 rounded-full flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" />
                     After
@@ -173,48 +196,66 @@ const Auth = () => {
               </div>
             </div>
           </div>
-          
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 pt-2">
-            <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">5 min</div>
-              <div className="text-xs text-muted-foreground">Micro-tasks</div>
-            </div>
-            <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">AI</div>
-              <div className="text-xs text-muted-foreground">Powered</div>
-            </div>
-            <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">ADHD</div>
-              <div className="text-xs text-muted-foreground">Friendly</div>
-            </div>
-          </div>
 
-          {/* Account benefits nudge */}
+          {/* CHANGE 3: Disclaimer below photos */}
+          <p className="text-xs text-muted-foreground/50 text-center mt-2 px-4">
+            AI-generated examples. Your actual results will vary — and that's totally fine.
+          </p>
+
+          {/* CHANGE 4: "Why it actually works" benefits section */}
           <div className="rounded-xl bg-background/60 backdrop-blur-sm border border-primary/20 p-4 space-y-2.5">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide">When you create an account</p>
+            <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3">
+              Why it actually works
+            </p>
             <ul className="space-y-2">
               {[
-              "📈 Track your streak and watch your habit grow",
-              "🏆 Earn points and level up as you go",
-              "📸 Save every before & after — your visual record",
-              "🔁 Pick up exactly where you left off, every time"].
-              map((item) =>
-              <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
+                "📍 AI looks at YOUR room and makes a plan — not a generic checklist",
+                "⏱️ Tasks take 5 minutes or less — designed to beat ADHD paralysis",
+                "🔥 Streaks and points that make starting feel good, not guilty",
+                "📸 Save every before & after — proof that you're making progress",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
                   <span>{item}</span>
                 </li>
-              )}
+              ))}
             </ul>
           </div>
-         </div>
+
+          {/* CHANGE 7: Urgency/momentum line at bottom */}
+          <div className="text-center py-4 border-t border-border/40">
+            <p className="text-sm text-muted-foreground">
+              Takes 30 seconds to get your first task list.
+            </p>
+          </div>
+
+        </div>
       </div>
- 
+
       {/* Right Side - Auth Form */}
       <div className="flex-1 flex items-center justify-center p-4 lg:p-8">
         <div className="w-full max-w-md animate-fade-in">
           {/* Mobile Header with mini showcase */}
           <div className="lg:hidden mb-6">
-            <div className="flex items-center justify-center gap-1.5 mb-4">
+            <div className="text-center mb-5 px-4">
+              <h1 className="font-black text-2xl leading-tight text-foreground mb-2">
+                Turns out we don't hate cleaning.{" "}
+                <span className="text-primary">We hate starting.</span>
+              </h1>
+            </div>
+            <div className="flex justify-center gap-2 flex-wrap mb-4">
+              {[
+                { icon: '⚡', label: '5-min tasks' },
+                { icon: '🧠', label: 'ADHD-friendly' },
+                { icon: '✨', label: 'AI-powered' },
+              ].map(f => (
+                <div key={f.label}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+                  <span>{f.icon}</span>
+                  {f.label}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-center gap-1.5 mb-2">
               <div className="w-10 h-10 rounded-lg overflow-hidden border border-destructive/30">
                 <img src={beforeRoom} alt="Before" loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
@@ -232,7 +273,7 @@ const Auth = () => {
               </div>
             </div>
           </div>
- 
+
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
               <Leaf className="w-8 h-8 text-primary" />
@@ -245,30 +286,30 @@ const Auth = () => {
 
           <Card className="border-0 shadow-lg">
             <CardHeader className="space-y-1 pb-4">
+              {/* CHANGE 5: Redesigned auth form header */}
               <CardTitle className="text-2xl text-center">
-                {isLogin ? "Welcome back" : "Get started"}
+                {isLogin ? "Welcome back" : "Start for free"}
               </CardTitle>
               <CardDescription className="text-center">
-                {isLogin ?
-                "Sign in to continue your journey" :
-                "Create an account to start decluttering"}
+                {isLogin
+                  ? "Your streak is waiting for you."
+                  : "No credit card. No overwhelm. Just one room."}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
-                {!isLogin &&
-                <div className="space-y-2">
+                {!isLogin && (
+                  <div className="space-y-2">
                     <Label htmlFor="displayName">Display Name</Label>
                     <Input
-                    id="displayName"
-                    type="text"
-                    placeholder="What should we call you?"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="h-12" />
-                  
+                      id="displayName"
+                      type="text"
+                      placeholder="What should we call you?"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      className="h-12" />
                   </div>
-                }
+                )}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -279,7 +320,6 @@ const Auth = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="h-12" />
-                  
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
@@ -292,22 +332,22 @@ const Auth = () => {
                     required
                     minLength={6}
                     className="h-12" />
-                  
                 </div>
                 <Button
                   type="submit"
                   className="w-full h-12 text-base font-medium"
                   disabled={loading}>
-                  {loading ?
-                  <span className="flex items-center gap-2">
+                  {loading ? (
+                    <span className="flex items-center gap-2">
                       <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       {isLogin ? "Signing in..." : "Creating account..."}
-                    </span> :
-                  <span className="flex items-center gap-2">
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" />
                       {isLogin ? "Sign in" : "Create account"}
                     </span>
-                  }
+                  )}
                 </Button>
 
                 <div className="relative">
@@ -343,14 +383,18 @@ const Auth = () => {
                   </div>
                 </div>
 
+                {/* CHANGE 6: More prominent guest mode button */}
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-12 text-base font-medium border-primary/40 text-primary hover:bg-primary/5 hover:text-primary hover:border-primary gap-2"
+                  className="w-full h-12 text-base font-semibold border-primary/30 text-primary bg-primary/5 hover:bg-primary/10 gap-2"
                   onClick={handleGuestMode}>
                   <Sparkles className="w-4 h-4" />
-                  Try it without logging in
+                  Try it without signing up
                 </Button>
+                <p className="text-xs text-muted-foreground/60 text-center -mt-2">
+                  No account needed · see how it works first
+                </p>
               </form>
 
               <div className="mt-6 text-center">
@@ -362,10 +406,9 @@ const Auth = () => {
                     if (switchingToSignup) analytics.signupStarted();
                   }}
                   className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                  
-                  {isLogin ?
-                  "Don't have an account? Sign up" :
-                  "Already have an account? Sign in"}
+                  {isLogin
+                    ? "Don't have an account? Sign up"
+                    : "Already have an account? Sign in"}
                 </button>
               </div>
             </CardContent>
@@ -375,9 +418,9 @@ const Auth = () => {
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>
-       </div>
-     </div>);
-
+      </div>
+    </div>
+  );
 };
 
 export default Auth;
