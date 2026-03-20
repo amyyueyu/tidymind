@@ -218,8 +218,30 @@ const ChallengePage = () => {
     const startTime = ch.time_estimate_minutes * 60;
     setTimeRemaining(startTime);
     setTimerActive(true);
+    setTimerStarted(true);
     setChallengeStartTime(Date.now());
     let remaining = startTime;
+    intervalRef.current = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setTimerActive(false);
+        setTimeRemaining(0);
+        toast("⏰ Time's up! How did it go?");
+      } else {
+        setTimeRemaining(remaining);
+      }
+    }, 1000);
+  }, [stopInterval]);
+
+  const resumeTimer = useCallback(() => {
+    stopInterval();
+    setTimerActive(true);
+    let remaining = 0;
+    setTimeRemaining((prev) => { remaining = prev; return prev; });
     intervalRef.current = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
