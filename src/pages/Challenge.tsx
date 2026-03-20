@@ -43,6 +43,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
 import { useConfetti } from "@/hooks/useConfetti";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
 // ─── Audio helpers ─────────────────────────────────────────────────────────────
 function playTone(

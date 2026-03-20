@@ -18,6 +18,8 @@ import {
   Palette,
 } from "lucide-react";
 import { analytics } from "@/lib/analytics";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
 type Intent = "tidy" | "declutter" | "redesign";
 
