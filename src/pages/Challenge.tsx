@@ -907,6 +907,36 @@ const ChallengePage = () => {
                   </p>
                 )}
 
+                {/* Start / Continue / Pause + Restart */}
+                <div className="grid grid-cols-2 gap-2 mt-3 mb-4">
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-11 gap-2 rounded-xl font-semibold text-sm",
+                      timerActive
+                        ? "border-primary/40 text-primary bg-primary/5"
+                        : "border-border text-foreground"
+                    )}
+                    onClick={timerActive ? pauseTimer : (timerStarted ? resumeTimer : startTimer)}
+                  >
+                    {timerActive ? (
+                      <><Pause className="w-3.5 h-3.5" /> Pause</>
+                    ) : timerStarted ? (
+                      <><Play className="w-3.5 h-3.5" /> Continue</>
+                    ) : (
+                      <><Play className="w-3.5 h-3.5" /> Start</>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2 rounded-xl font-semibold text-sm border-border text-muted-foreground"
+                    onClick={startTimer}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Restart
+                  </Button>
+                </div>
+
                 {/* Music section */}
                 <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-5 text-left">
                   <div className="flex items-center justify-between mb-3">
