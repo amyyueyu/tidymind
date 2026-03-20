@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/sonner";
-import { Sparkles, Leaf, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
+import logoImg from "@/assets/logo.png";
 const beforeRoom = new URL("@/assets/before-room.jpg", import.meta.url).href;
 const afterRoom = new URL("@/assets/after-room.jpg", import.meta.url).href;
 const beforeBedroom = new URL("@/assets/before-bedroom.jpg", import.meta.url).href;
@@ -234,8 +235,8 @@ const Auth = () => {
           </div>
  
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Leaf className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center mb-4">
+              <img src={logoImg} alt="TidyMate logo" className="w-20 h-20 rounded-3xl" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">TidyMate</h1>
             <p className="text-muted-foreground mt-2">
