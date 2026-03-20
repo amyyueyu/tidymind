@@ -621,12 +621,12 @@ const ChallengePage = () => {
           <div className="animate-fade-in">
             <Trophy className="w-16 h-16 text-primary mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">
-              {isGuest ? "You crushed it! 🎉" : "All Done! 🎉"}
+              {isGuest ? t('challenge.guest.title') : t('challenge.complete.title')}
             </h2>
             <p className="text-muted-foreground">
               {isGuest
-                ? "You just completed a full declutter session. Imagine what you could do with streaks, points, and your progress saved."
-                : "You've completed all challenges for this space!"}
+                ? t('challenge.guest.sub')
+                : t('challenge.complete.sub')}
             </p>
             {fastestWasEarly && fastestChallenge && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 rounded-lg p-3 mt-3 text-left">
