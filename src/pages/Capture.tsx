@@ -527,10 +527,10 @@ const Capture = () => {
                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold text-lg mb-1">Challenges Ready! 🎉</h3>
+                <h3 className="font-semibold text-lg mb-1">{t('capture.ready.title')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {generatingVision
-                    ? "Your vision is being created... You can start now or wait!"
+                    ? t('capture.ready.sub')
                     : visionImage
                     ? "Your vision is ready! Start your challenges to transform your space."
                     : "Let's start transforming your space!"}
