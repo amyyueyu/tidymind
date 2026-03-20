@@ -291,6 +291,13 @@ const ChallengePage = () => {
     const estimatedSecs = currentChallenge.time_estimate_minutes * 60;
     const finishedEarly = actualSecs > 0 && actualSecs < estimatedSecs * 0.6;
 
+    // Play sound effect
+    if (finishedEarly) {
+      playEarlyFinishSound();
+    } else {
+      playDoneSound();
+    }
+
     const newCompletedCount = completedCount + 1;
     const isLast = currentChallengeIndex === challenges.length - 1;
 
