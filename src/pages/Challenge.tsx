@@ -1089,12 +1089,14 @@ const ChallengePage = () => {
               </div>
             )}
 
-            {/* Hidden YouTube BGM iframe */}
-            {musicOn && timerActive && (
+            {/* Hidden YouTube BGM iframe
+                Mount as soon as musicOn=true (during the user's gesture) so iOS Safari
+                grants autoplay permission. Play/pause is then controlled via postMessage. */}
+            {musicOn && (
               <iframe
                 key={`music-${musicVibe}-${musicKey}`}
                 ref={musicIframeRef}
-                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}`}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}&enablejsapi=1`}
                 allow="autoplay; encrypted-media"
                 allowFullScreen={false}
                 style={{ display: "none", position: "absolute", width: 0, height: 0, border: "none" }}
