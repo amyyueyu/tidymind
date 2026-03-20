@@ -32,7 +32,16 @@ const Index = () => {
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const greeting = useMemo(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)], []);
+
+  const isFirstTimeUser = useMemo(() => {
+    if (profileLoading || authLoading) return false;
+    if (!profile) return false;
+    if (activeRooms.length > 0) return false;
+    if (profile.total_points > 0) return false;
+    return true;
+  }, [profile, activeRooms, profileLoading, authLoading]);
 
   useEffect(() => {
     analytics.landingView();
