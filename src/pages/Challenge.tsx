@@ -161,6 +161,14 @@ const ChallengePage = () => {
   const [showShareCard, setShowShareCard] = useState(false);
   const [sessionStartTime] = useState(() => Date.now());
 
+  // Level-up modal + share card state
+  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
+  const [levelUpData, setLevelUpData] = useState<{
+    newLevel: number;
+    badge: typeof LEVEL_BADGES[1];
+  } | null>(null);
+  const [showLevelUpShareCard, setShowLevelUpShareCard] = useState(false);
+
   // Refs to avoid stale closures in timer and to gate guest hydration
   const challengesRef = useRef<Challenge[]>([]);
   const challengeIndexRef = useRef(0);
