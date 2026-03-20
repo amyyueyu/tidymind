@@ -1002,24 +1002,24 @@ const ChallengePage = () => {
                   </span>
                 </div>
 
-                {/* Level 1 — Done (primary, full-width, most prominent) */}
-                <Button
-                  className="w-full h-14 text-base font-bold gap-2 rounded-2xl"
-                  style={{ boxShadow: "0 4px 20px rgba(13,156,107,0.25)" }}
-                  onClick={completeChallenge}
-                >
-                  <Check className="w-5 h-5" />
-                  Done!
-                </Button>
-
-                {/* Level 3 — Skip (text-only, understated) */}
-                <button
-                  className="w-full h-10 flex items-center justify-center gap-1.5 text-sm text-muted-foreground/50 mt-1 hover:text-muted-foreground transition-colors"
-                  onClick={skipChallenge}
-                >
-                  <SkipForward className="w-3.5 h-3.5" />
-                  Skip this task
-                </button>
+                {/* Done + Skip row */}
+                <div className="flex gap-2">
+                  <button
+                    className="flex-1 h-10 flex items-center justify-center gap-1.5 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors border border-border/50 rounded-2xl"
+                    onClick={skipChallenge}
+                  >
+                    <SkipForward className="w-3.5 h-3.5" />
+                    Skip
+                  </button>
+                  <Button
+                    className="flex-[2] h-14 text-base font-bold gap-2 rounded-2xl"
+                    style={{ boxShadow: "0 4px 20px rgba(13,156,107,0.25)" }}
+                    onClick={completeChallenge}
+                  >
+                    <Check className="w-5 h-5" />
+                    Done!
+                  </Button>
+                </div>
 
                 {/* Progress photo — dashed tertiary */}
                 {!praiseData ? (
