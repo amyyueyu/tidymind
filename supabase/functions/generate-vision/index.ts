@@ -9,9 +9,9 @@ const corsHeaders = {
 const VISION_PROMPT =
   "This is a photo of a real room. Generate a realistic tidied-up version of THIS SAME room. Keep identical furniture placement, wall colors, flooring, windows, and room layout. Only remove clutter, straighten items, and make surfaces cleaner. The result must look like the same physical room — not a different room. Photorealistic. Natural lighting. Achievable level of cleanliness, not perfect.";
 
-// Limits: authenticated users get 10 vision calls/hour, guests get 3/hour
+// Limits: authenticated users get 10 vision calls/hour, guests get 5/hour
 const AUTHED_MAX = 10;
-const GUEST_MAX = 3;
+const GUEST_MAX = 5;
 const WINDOW_SECONDS = 3600;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
