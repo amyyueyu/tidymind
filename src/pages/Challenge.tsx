@@ -997,7 +997,7 @@ const ChallengePage = () => {
                 {/* Done + Skip row */}
                 <div className="flex gap-2">
                   <button
-                    className="flex-1 h-10 flex items-center justify-center gap-1.5 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors border border-border/50 rounded-2xl"
+                    className="flex-1 h-14 flex items-center justify-center gap-1.5 text-sm text-muted-foreground/50 hover:text-muted-foreground transition-colors border border-border/50 rounded-2xl"
                     onClick={skipChallenge}
                   >
                     <SkipForward className="w-3.5 h-3.5" />
