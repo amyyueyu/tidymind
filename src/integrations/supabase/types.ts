@@ -49,6 +49,7 @@ export type Database = {
       }
       challenges: {
         Row: {
+          actual_seconds: number | null
           completed_at: string | null
           created_at: string
           description: string | null
@@ -62,6 +63,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          actual_seconds?: number | null
           completed_at?: string | null
           created_at?: string
           description?: string | null
@@ -75,6 +77,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          actual_seconds?: number | null
           completed_at?: string | null
           created_at?: string
           description?: string | null
