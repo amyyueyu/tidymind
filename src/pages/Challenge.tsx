@@ -761,7 +761,65 @@ const ChallengePage = () => {
                   >
                     {formatTime(timeRemaining)}
                   </div>
-                  <div className="flex justify-center gap-3">
+                {/* Music section — inside timer card */}
+                <div className="bg-muted/40 rounded-2xl p-3 mx-0 mb-4">
+                  {/* Header row: label + toggle */}
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <Music className="w-3.5 h-3.5" />
+                      Countdown music
+                    </div>
+                    <button
+                      onClick={() => setMusicOn((prev) => !prev)}
+                      className={cn(
+                        "relative w-10 h-5 rounded-full transition-colors",
+                        musicOn ? "bg-primary" : "bg-muted-foreground/30"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200",
+                          musicOn ? "translate-x-5" : "translate-x-0.5"
+                        )}
+                      />
+                    </button>
+                  </div>
+
+                  {musicOn && (
+                    <>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {MUSIC_VIBES.map((vibe) => (
+                          <button
+                            key={vibe.id}
+                            onClick={() => setMusicVibe(vibe.id)}
+                            className={cn(
+                              "flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border-[1.5px] transition-colors",
+                              musicVibe === vibe.id
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background text-muted-foreground border-border"
+                            )}
+                          >
+                            <span>{vibe.emoji}</span>
+                            {vibe.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse flex-shrink-0" />
+                        <span className="text-[10px] text-primary font-semibold">
+                          {MUSIC_VIBES.find((v) => v.id === musicVibe)?.label}
+                          {" "}· playing while timer runs
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {!musicOn && (
+                    <p className="text-[11px] text-muted-foreground">Add rhythm to your countdown</p>
+                  )}
+                </div>
+
+                <div className="flex justify-center gap-3">
                     {!timerActive ? (
                       <Button type="button" onClick={startTimer} size="lg" className="gap-2">
                         <Play className="w-5 h-5" />
