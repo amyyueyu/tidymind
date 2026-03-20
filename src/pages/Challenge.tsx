@@ -296,6 +296,7 @@ const ChallengePage = () => {
     setTimerStarted(true);
     setChallengeStartTime(Date.now());
     acquireWakeLock();
+    sendYouTubeCommand("playVideo");
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -307,17 +308,19 @@ const ChallengePage = () => {
         setTimerActive(false);
         setTimeRemaining(0);
         releaseWakeLock();
+        sendYouTubeCommand("pauseVideo");
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
       }
     }, 1000);
-  }, [stopInterval]);
+  }, [stopInterval, sendYouTubeCommand]);
 
   const resumeTimer = useCallback(() => {
     stopInterval();
     setTimerActive(true);
     acquireWakeLock();
+    sendYouTubeCommand("playVideo");
     let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -329,18 +332,20 @@ const ChallengePage = () => {
         setTimerActive(false);
         setTimeRemaining(0);
         releaseWakeLock();
+        sendYouTubeCommand("pauseVideo");
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
       }
     }, 1000);
-  }, [stopInterval]);
+  }, [stopInterval, sendYouTubeCommand]);
 
   const pauseTimer = useCallback(() => {
     stopInterval();
     setTimerActive(false);
     releaseWakeLock();
-  }, [stopInterval]);
+    sendYouTubeCommand("pauseVideo");
+  }, [stopInterval, sendYouTubeCommand]);
 
   const fetchRoomData = async () => {
     setLoading(true);
