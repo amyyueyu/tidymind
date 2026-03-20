@@ -446,6 +446,7 @@ const ChallengePage = () => {
     if (challenge.status === "completed") return;
     stopInterval();
     setTimerActive(false);
+    setTimerStarted(false);
     setCurrentChallengeIndex(index);
     setTimeRemaining(challenge.time_estimate_minutes * 60);
   };
