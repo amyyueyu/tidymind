@@ -46,6 +46,7 @@ interface Challenge {
   points: number;
   status: string;
   sort_order: number;
+  actual_seconds?: number | null;
 }
 
 interface Room {
