@@ -942,9 +942,9 @@ const ChallengePage = () => {
                     onClick={timerActive ? pauseTimer : (timerStarted ? resumeTimer : startTimer)}
                   >
                     {timerActive ? (
-                      <><Pause className="w-3.5 h-3.5" /> Pause</>
+                      <><Pause className="w-3.5 h-3.5" /> {t('challenge.pause.btn')}</>
                     ) : timerStarted ? (
-                      <><Play className="w-3.5 h-3.5" /> Continue</>
+                      <><Play className="w-3.5 h-3.5" /> {t('challenge.continue.btn')}</>
                     ) : (
                       <><Play className="w-3.5 h-3.5" /> Start</>
                     )}
