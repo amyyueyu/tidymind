@@ -115,9 +115,7 @@ const Auth = () => {
           ))}
         </div>
 
-
-
-        {/* Single before/after photo */}
+        {/* Before/after photos with center arrow badge */}
         <div className="relative rounded-2xl overflow-hidden mb-2 shadow-sm">
           <div className="flex">
             <div className="relative flex-1">
@@ -146,28 +144,29 @@ const Auth = () => {
               </div>
             </div>
           </div>
+          {/* Center arrow badge */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md flex items-center justify-center">
+            <ArrowRight className="w-4 h-4 text-primary" />
+          </div>
         </div>
 
         {/* Photo caption */}
-        <p className="text-xs text-muted-foreground/60 mb-6">
-          AI-generated examples. Your actual results will vary — and that's totally fine.
+        <p className="text-[10px] text-muted-foreground/50 text-center mt-2 mb-4">
+          Real room · results vary — that's ok
         </p>
 
-        {/* Why it works card */}
-        <div className="rounded-xl border border-border bg-background/70 p-5 mb-8">
-          <p className="text-[11px] font-bold text-primary uppercase tracking-widest mb-3">
-            Why it actually works
-          </p>
-          <ul className="space-y-2.5">
-            {[
-              "📍 AI looks at YOUR room and makes a plan — not a generic checklist",
-              "⏱️ Tasks take 5 minutes or less — designed to beat ADHD paralysis",
-              "🔥 Streaks and points that make starting feel good, not guilty",
-              "📸 Save every before & after — proof that you're making progress",
-            ].map(item => (
-              <li key={item} className="text-sm text-foreground/80 leading-snug">{item}</li>
-            ))}
-          </ul>
+        {/* Stats row */}
+        <div className="grid grid-cols-3 divide-x divide-border bg-white rounded-2xl border border-border overflow-hidden mb-8">
+          {[
+            { n: '300+', label: 'rooms\ntackled' },
+            { n: '5 min', label: 'avg task\nlength' },
+            { n: '0',    label: 'guilt\nrequired' },
+          ].map(s => (
+            <div key={s.n} className="py-4 px-4 text-center">
+              <p className="font-black text-2xl text-primary leading-none mb-1">{s.n}</p>
+              <p className="text-xs text-muted-foreground leading-snug whitespace-pre-line">{s.label}</p>
+            </div>
+          ))}
         </div>
 
         {/* Bottom urgency line */}
