@@ -128,6 +128,12 @@ const ChallengePage = () => {
   const [showVision, setShowVision] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
 
+  // Music state
+  const [musicOn, setMusicOn] = useState(false);
+  const [musicVibe, setMusicVibe] = useState<"focus" | "calm" | "energy">("focus");
+
+  const toggleMusic = () => setMusicOn((prev) => !prev);
+
   // Progress photo & sharing state
   const [showProgressUpload, setShowProgressUpload] = useState(false);
   const [praiseData, setPraiseData] = useState<{
