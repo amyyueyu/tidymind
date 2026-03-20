@@ -330,13 +330,15 @@ const Capture = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Leaf className="w-5 h-5 text-primary" />
-            <span className="font-semibold">Capture Space</span>
+            <span className="font-semibold">{t('capture.title')}</span>
           </div>
           {isGuest && (
             <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-              Guest preview
+              {t('capture.guest.badge')}
             </span>
           )}
+          {!isGuest && <span className="ml-auto"><LangToggle /></span>}
+          {isGuest && <LangToggle />}
         </div>
       </header>
 
