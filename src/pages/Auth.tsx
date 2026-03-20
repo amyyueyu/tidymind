@@ -206,19 +206,6 @@ const Auth = () => {
 
           {/* Auth form */}
           <form onSubmit={handleSubmit} className="space-y-3.5">
-            {!isLogin && (
-              <div className="space-y-1.5">
-                <Label htmlFor="displayName">Display Name</Label>
-                <Input
-                  id="displayName"
-                  type="text"
-                  placeholder="What should we call you?"
-                  value={displayName}
-                  onChange={e => setDisplayName(e.target.value)}
-                  className="h-11"
-                />
-              </div>
-            )}
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <Input
