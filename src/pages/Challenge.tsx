@@ -918,7 +918,7 @@ const ChallengePage = () => {
                         {formatTime(timeRemaining)}
                       </span>
                       <span className="text-xs text-muted-foreground mt-1 font-medium">
-                        remaining
+                        {t('challenge.remaining')}
                       </span>
                     </div>
                   </div>
