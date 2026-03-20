@@ -14,6 +14,9 @@ interface ShareCardProps {
   sessionMinutes: number;
   roomName: string;
   roomId?: string;
+  fastestTaskSecs?: number;
+  fastestTaskTitle?: string;
+  estimatedTaskMins?: number;
 }
 
 const CANVAS_W = 1080;
