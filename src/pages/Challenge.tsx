@@ -131,6 +131,7 @@ const ChallengePage = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [challengeStartTime, setChallengeStartTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
