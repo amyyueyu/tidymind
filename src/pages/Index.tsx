@@ -167,7 +167,7 @@ const Index = () => {
         <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
           <span className="text-xl block mb-0.5">🏆</span>
           <p className="font-black text-xl text-primary leading-none">Lv.{profile.current_level}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">Level</p>
+          <p className="text-[10px] text-gray-400 mt-0.5 truncate">{badge.title}</p>
         </div>
       </div>
 
