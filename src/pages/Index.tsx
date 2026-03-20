@@ -4,20 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { analytics } from "@/lib/analytics";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { 
-  Camera, 
-  Flame, 
-  Star, 
-  Trophy, 
-  LogOut,
+import {
+  Camera,
   Leaf,
   ArrowRight,
+  LogOut,
   Sparkles,
 } from "lucide-react";
+import { getBadgeForLevel } from "@/lib/levelBadges";
 
 const GREETINGS = [
   "No pressure. Even 10 minutes counts.",
@@ -26,6 +20,17 @@ const GREETINGS = [
   "You showed up. That's the hard part.",
   "Small wins are still wins.",
 ];
+
+function getRoomEmoji(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("bedroom") || n.includes("bed")) return "🛏️";
+  if (n.includes("desk") || n.includes("office")) return "🖥️";
+  if (n.includes("kitchen")) return "🍳";
+  if (n.includes("bathroom") || n.includes("bath")) return "🚿";
+  if (n.includes("living") || n.includes("lounge")) return "🛋️";
+  if (n.includes("storage") || n.includes("closet")) return "📦";
+  return "✨";
+}
 
 const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -69,7 +74,7 @@ const Index = () => {
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(3);
-    
+
     if (data) setActiveRooms(data);
     setRoomsLoaded(true);
   };
@@ -109,6 +114,8 @@ const Index = () => {
 
   const levelProgress = profile.total_points % 100;
   const pointsToNextLevel = 100 - levelProgress;
+  const displayName = profile.display_name || "friend";
+  const badge = getBadgeForLevel(profile.current_level);
 
   const streakMessage =
     profile.current_streak === 0
@@ -118,178 +125,180 @@ const Index = () => {
       : "Look at you showing up consistently. 🔥";
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <div className="container max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-[#f5f4f0]">
+      {/* ── Hero Header ─────────────────────────────────────────────── */}
+      <div className="bg-primary px-6 pt-14 pb-10 relative overflow-hidden">
+        <div className="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-white/5 pointer-events-none" />
+        <div className="absolute -bottom-10 -left-8 w-40 h-40 rounded-full bg-white/[0.04] pointer-events-none" />
+
+        {/* Nav row */}
+        <div className="flex justify-between items-center mb-6 relative z-10">
           <div className="flex items-center gap-2">
-            <Leaf className="w-6 h-6 text-primary" />
-            <span className="font-semibold text-lg">TidyMate</span>
+            <Leaf className="w-5 h-5 text-white" />
+            <span className="font-bold text-white text-lg">TidyMate</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={signOut}>
-              <LogOut className="w-5 h-5" />
-            </Button>
+          <button
+            onClick={signOut}
+            className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center"
+          >
+            <LogOut className="w-4 h-4 text-white/80" />
+          </button>
+        </div>
+
+        {/* Greeting */}
+        <h1 className="font-black text-white text-3xl leading-tight mb-1 relative z-10">
+          Hey, {displayName}! 👋
+        </h1>
+        <p className="text-white/70 text-sm relative z-10">{greeting}</p>
+      </div>
+
+      {/* ── Floating Stat Cards ──────────────────────────────────────── */}
+      <div className="grid grid-cols-3 gap-2 mx-5 -mt-6 relative z-10">
+        <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+          <span className="text-xl block mb-0.5">🔥</span>
+          <p className="font-black text-xl text-amber-500 leading-none">{profile.current_streak}</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">Day streak</p>
+        </div>
+        <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+          <span className="text-xl block mb-0.5">⭐</span>
+          <p className="font-black text-xl text-violet-600 leading-none">{profile.total_points}</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">Points</p>
+        </div>
+        <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
+          <span className="text-xl block mb-0.5">🏆</span>
+          <p className="font-black text-xl text-primary leading-none">Lv.{profile.current_level}</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">Level</p>
+        </div>
+      </div>
+
+      {/* ── Body ────────────────────────────────────────────────────── */}
+      <div className="px-5 pt-3 pb-24">
+
+        {/* Level progress bar */}
+        <div className="bg-white rounded-2xl px-4 py-3 mb-3.5 mt-3" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+          <div className="flex justify-between items-center mb-2">
+            <span className="font-bold text-sm text-gray-900">
+              {badge.title} · Level {profile.current_level}
+            </span>
+            <span className="text-[11px] text-gray-400">
+              {pointsToNextLevel} pts to Lv.{profile.current_level + 1}
+            </span>
+          </div>
+          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${levelProgress}%` }}
+            />
           </div>
         </div>
-      </header>
 
-      <main className="container max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {/* Welcome Section */}
-        <div className="animate-fade-in">
-          <h1 className="text-2xl font-bold text-foreground">
-            Hey, {profile.display_name || "friend"}! 👋
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            {greeting}
-          </p>
+        {/* Primary CTA card */}
+        <div
+          className="bg-primary rounded-2xl p-5 mb-5 flex items-center gap-4 relative overflow-hidden cursor-pointer active:scale-95 transition-transform"
+          onClick={() => navigate("/capture")}
+          style={{ boxShadow: "0 4px 20px rgba(13,156,107,0.3)" }}
+        >
+          <div className="absolute -top-10 -right-5 w-28 h-28 rounded-full bg-white/[0.08] pointer-events-none" />
+          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Camera className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1 relative z-10">
+            <p className="font-extrabold text-white text-base leading-tight">
+              Capture a new space
+            </p>
+            <p className="text-white/70 text-xs mt-0.5">
+              AI turns chaos into a plan in 30s
+            </p>
+          </div>
+          <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center relative z-10">
+            <ArrowRight className="w-4 h-4 text-white" />
+          </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <Card className="border-0 shadow-sm bg-streak/10">
-            <CardContent className="p-4 text-center">
-              <Flame className={`w-6 h-6 mx-auto ${profile.current_streak > 0 ? "text-streak" : "text-muted-foreground"}`} />
-              <p className="text-2xl font-bold mt-1">{profile.current_streak}</p>
-              <p className="text-xs text-muted-foreground">
-                {profile.current_streak === 0 ? "Start today" : "Day Streak"}
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-points/10">
-            <CardContent className="p-4 text-center">
-              <Star className="w-6 h-6 text-points mx-auto" />
-              <p className="text-2xl font-bold mt-1">{profile.total_points}</p>
-              <p className="text-xs text-muted-foreground">Points</p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-primary/10">
-            <CardContent className="p-4 text-center">
-              <Trophy className="w-6 h-6 text-primary mx-auto" />
-              <p className="text-2xl font-bold mt-1">Lv.{profile.current_level}</p>
-              <p className="text-xs text-muted-foreground">Level</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Level Progress */}
-        <Card className="border-0 shadow-sm animate-fade-in" style={{ animationDelay: "0.2s" }}>
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Level {profile.current_level}</span>
-              <span className="text-xs text-muted-foreground">
-                {pointsToNextLevel} pts to next level
+        {/* Active challenges */}
+        {activeRooms.length > 0 && (
+          <>
+            <div className="flex justify-between items-center mb-3">
+              <h2 className="font-black text-base text-gray-900">Active challenges</h2>
+              <span className="text-xs font-semibold bg-gray-900 text-white px-2.5 py-1 rounded-full">
+                {activeRooms.length} rooms
               </span>
             </div>
-            <Progress value={levelProgress} className="h-2" />
-          </CardContent>
-        </Card>
 
-        {/* Quick Action - Capture */}
-        <Card 
-          className="border-0 shadow-lg bg-gradient-to-br from-primary/5 to-primary/10 cursor-pointer hover:shadow-xl transition-all animate-fade-in"
-          style={{ animationDelay: "0.3s" }}
-          onClick={() => navigate("/capture")}
-        >
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shrink-0">
-                <Camera className="w-7 h-7 text-primary-foreground" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-lg">Capture a space</h3>
-                <p className="text-sm text-muted-foreground">
-                  Take a photo and let AI create your personalized challenges
-                </p>
-              </div>
-              <ArrowRight className="w-5 h-5 text-muted-foreground" />
-            </div>
-          </CardContent>
-        </Card>
+            {activeRooms.map((room) => {
+              const pct = room.total_challenges > 0
+                ? Math.round((room.completed_challenges / room.total_challenges) * 100)
+                : 0;
+              return (
+                <div
+                  key={room.id}
+                  className="bg-white rounded-2xl p-4 mb-2.5 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform relative overflow-hidden"
+                  style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}
+                  onClick={() => {
+                    analytics.challengeStarted({ room_type: room.intent, tasks_completed: room.completed_challenges });
+                    navigate(`/challenge/${room.id}`);
+                  }}
+                >
+                  {/* Left accent bar */}
+                  <div className={`absolute left-0 top-0 bottom-0 w-[3px] rounded-r-full ${room.completed_challenges > 0 ? "bg-primary" : "bg-gray-200"}`} />
 
-        {/* Active Challenges */}
-        {activeRooms.length > 0 && (
-          <div className="space-y-3 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-            <div className="flex items-center justify-between">
-              <h2 className="font-semibold text-lg">Active Challenges</h2>
-              <Badge variant="secondary" className="font-normal">
-                {activeRooms.length} rooms
-              </Badge>
-            </div>
-            {activeRooms.map((room) => (
-              <Card 
-                key={room.id} 
-                className="border-0 shadow-sm cursor-pointer hover:shadow-md transition-all"
-                onClick={() => { analytics.challengeStarted({ room_type: room.intent, tasks_completed: room.completed_challenges }); navigate(`/challenge/${room.id}`); }}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-primary" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{room.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {room.completed_challenges}/{room.total_challenges} challenges done
-                      </p>
-                    </div>
-                    <Progress 
-                      value={(room.completed_challenges / room.total_challenges) * 100} 
-                      className="w-16 h-2"
-                    />
+                  {/* Room emoji */}
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${room.completed_challenges > 0 ? "bg-primary/[0.08]" : "bg-gray-50"}`}>
+                    {getRoomEmoji(room.name)}
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+                  {/* Room info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm text-gray-900 truncate">{room.name}</p>
+                    <p className="text-[11px] text-gray-400 mt-0.5">
+                      {room.completed_challenges} of {room.total_challenges} done
+                      {room.completed_challenges === 0 ? " · not started" : " · keep going"}
+                    </p>
+                  </div>
+
+                  {/* Progress */}
+                  <div className="text-right flex-shrink-0">
+                    <p className={`font-black text-sm leading-none ${pct > 0 ? "text-primary" : "text-gray-300"}`}>
+                      {pct}%
+                    </p>
+                    <div className="w-11 h-1 bg-gray-100 rounded-full mt-1.5 overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </>
         )}
+      </div>
 
-        {/* Encouragement */}
-        <Card className="border-0 shadow-sm bg-accent/20 animate-fade-in" style={{ animationDelay: "0.5s" }}>
-          <CardContent className="p-4 text-center">
-            <p className="text-sm text-accent-foreground">
-              💪 {streakMessage}
-            </p>
-          </CardContent>
-        </Card>
-      </main>
-
-      {/* First-session onboarding overlay */}
+      {/* ── First-session onboarding overlay ──────────────────────── */}
       {showOnboarding && (
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
             onClick={() => handleOnboardingDismiss(false)}
           />
-
-          {/* Panel */}
           <div className="relative z-10 w-full max-w-sm mx-4 mb-6 sm:mb-0 bg-card rounded-3xl shadow-2xl p-8 animate-fade-in overflow-hidden">
-            {/* Floating leaf decoration */}
             <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/10 flex items-end justify-start pl-6 pb-4">
               <Leaf className="w-8 h-8 text-primary opacity-60" />
             </div>
-
-            {/* Icon */}
             <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
               <Camera className="w-8 h-8 text-primary-foreground" />
             </div>
-
-            {/* Headline */}
             <h2 className="text-2xl font-bold text-foreground leading-snug mb-3">
               Let's start with<br />one room.
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
               Take a photo and AI will break it into small, doable tasks. No overwhelm. Just one thing at a time.
             </p>
-
-            {/* Social proof micro-copy */}
             <p className="text-xs text-muted-foreground mb-6 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
               Takes 30 seconds to get your first challenge
             </p>
-
-            {/* Primary CTA */}
             <button
               onClick={() => handleOnboardingDismiss(true)}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-semibold py-3.5 text-base hover:bg-primary/90 transition-colors mb-3"
@@ -297,8 +306,6 @@ const Index = () => {
               <Camera className="w-5 h-5" />
               Take a photo now
             </button>
-
-            {/* Skip link */}
             <button
               onClick={() => handleOnboardingDismiss(false)}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
