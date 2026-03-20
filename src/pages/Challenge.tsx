@@ -282,6 +282,7 @@ const ChallengePage = () => {
     setTimerActive(true);
     setTimerStarted(true);
     setChallengeStartTime(Date.now());
+    acquireWakeLock();
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -292,6 +293,7 @@ const ChallengePage = () => {
         }
         setTimerActive(false);
         setTimeRemaining(0);
+        releaseWakeLock();
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
@@ -302,6 +304,7 @@ const ChallengePage = () => {
   const resumeTimer = useCallback(() => {
     stopInterval();
     setTimerActive(true);
+    acquireWakeLock();
     let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -312,6 +315,7 @@ const ChallengePage = () => {
         }
         setTimerActive(false);
         setTimeRemaining(0);
+        releaseWakeLock();
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
@@ -322,6 +326,7 @@ const ChallengePage = () => {
   const pauseTimer = useCallback(() => {
     stopInterval();
     setTimerActive(false);
+    releaseWakeLock();
   }, [stopInterval]);
 
   const fetchRoomData = async () => {
