@@ -9,9 +9,9 @@ const corsHeaders = {
 const VISION_PROMPT =
   "This is a photo of a real room. Generate a realistic tidied-up version of THIS SAME room. Keep identical furniture placement, wall colors, flooring, windows, and room layout. Only remove clutter, straighten items, and make surfaces cleaner. The result must look like the same physical room — not a different room. Photorealistic. Natural lighting. Achievable level of cleanliness, not perfect.";
 
-// Limits: authenticated users get 10 vision calls/hour, guests get 1/hour
+// Limits: authenticated users get 10 vision calls/hour, guests get 3/hour
 const AUTHED_MAX = 10;
-const GUEST_MAX = 1;
+const GUEST_MAX = 3;
 const WINDOW_SECONDS = 3600;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -56,24 +56,32 @@ serve(async (req) => {
   try {
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
     const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // --- Auth detection ---
+    // --- Auth detection (fix: use getUser instead of getClaims) ---
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: { headers: { Authorization: authHeader } },
-      });
       const token = authHeader.replace("Bearer ", "");
-      const { data, error } = await supabase.auth.getClaims(token);
-      if (!error && data?.claims?.sub) {
-        userId = data.claims.sub;
+      // Skip JWT decode for anon key (it's not a user token)
+      if (token !== SUPABASE_ANON_KEY) {
+        try {
+          const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            global: { headers: { Authorization: authHeader } },
+          });
+          const { data: { user }, error } = await supabaseAuth.auth.getUser(token);
+          if (!error && user?.id) {
+            userId = user.id;
+          }
+        } catch (authErr) {
+          console.warn("Auth check failed, treating as guest:", authErr);
+        }
       }
     }
 
@@ -88,7 +96,8 @@ serve(async (req) => {
       : `ip:${clientIp}:generate-vision`;
     const maxCalls = userId ? AUTHED_MAX : GUEST_MAX;
 
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Use service role key for rate limit RPC to avoid RLS issues
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY);
     const { data: allowed, error: rlError } = await supabaseAdmin.rpc(
       "check_and_increment_rate_limit",
       {
@@ -100,6 +109,7 @@ serve(async (req) => {
 
     if (rlError) {
       console.error("Rate limit check error:", rlError);
+      // Don't block on rate limit errors — fail open
     } else if (allowed === false) {
       return new Response(
         JSON.stringify({
@@ -111,7 +121,18 @@ serve(async (req) => {
       );
     }
 
-    const { imageUrl } = await req.json();
+    const body = await req.json();
+    const { imageUrl } = body;
+
+    if (!imageUrl) {
+      return new Response(
+        JSON.stringify({ error: "imageUrl is required" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Generating vision for ${userId ? `user ${userId}` : "guest"}, image type: ${imageUrl.startsWith("data:") ? "base64" : "url"}`);
+
     const response = await callVisionAPI(imageUrl, LOVABLE_API_KEY);
 
     if (!response.ok) {
@@ -137,6 +158,7 @@ serve(async (req) => {
     const message = data.choices?.[0]?.message?.content;
 
     if (!generatedImage) {
+      console.error("No image in response:", JSON.stringify(data).slice(0, 500));
       throw new Error("No image generated");
     }
 
