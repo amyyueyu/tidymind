@@ -178,6 +178,26 @@ const ChallengePage = () => {
   const guestHydratedRoomIdRef = useRef<string | null>(null);
   const timeRemainingRef = useRef(0);
 
+  // Wake lock ref
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const acquireWakeLock = async () => {
+    if ("wakeLock" in navigator) {
+      try {
+        wakeLockRef.current = await (navigator as any).wakeLock.request("screen");
+      } catch {
+        // Wake lock not available — fail silently
+      }
+    }
+  };
+
+  const releaseWakeLock = () => {
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release();
+      wakeLockRef.current = null;
+    }
+  };
+
   // Keep refs in sync with state on every render
   challengesRef.current = challenges;
   challengeIndexRef.current = currentChallengeIndex;
@@ -231,6 +251,20 @@ const ChallengePage = () => {
   // Cleanup interval on unmount
   useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
 
+  // Release wake lock on unmount; reacquire after page becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === "visible" && timerActive) {
+        await acquireWakeLock();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      releaseWakeLock();
+    };
+  }, [timerActive]);
+
   const stopInterval = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -248,6 +282,7 @@ const ChallengePage = () => {
     setTimerActive(true);
     setTimerStarted(true);
     setChallengeStartTime(Date.now());
+    acquireWakeLock();
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -258,6 +293,7 @@ const ChallengePage = () => {
         }
         setTimerActive(false);
         setTimeRemaining(0);
+        releaseWakeLock();
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
@@ -268,6 +304,7 @@ const ChallengePage = () => {
   const resumeTimer = useCallback(() => {
     stopInterval();
     setTimerActive(true);
+    acquireWakeLock();
     let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -278,6 +315,7 @@ const ChallengePage = () => {
         }
         setTimerActive(false);
         setTimeRemaining(0);
+        releaseWakeLock();
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
@@ -288,6 +326,7 @@ const ChallengePage = () => {
   const pauseTimer = useCallback(() => {
     stopInterval();
     setTimerActive(false);
+    releaseWakeLock();
   }, [stopInterval]);
 
   const fetchRoomData = async () => {
@@ -341,6 +380,7 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
     setTimerStarted(false);
+    releaseWakeLock();
 
     // Calculate actual time spent
     const actualSecs = challengeStartTime
@@ -445,6 +485,7 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
     setTimerStarted(false);
+    releaseWakeLock();
 
     if (isGuest) {
       updateGuestChallenge(currentChallenge.id, { status: "skipped" });
@@ -860,6 +901,11 @@ const ChallengePage = () => {
                     </div>
                   </div>
                 </div>
+                {timerActive && wakeLockRef.current && (
+                  <p className="text-xs text-muted-foreground text-center -mt-2 mb-1">
+                    Screen will stay on during session
+                  </p>
+                )}
 
                 {/* Music section */}
                 <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-5 text-left">
