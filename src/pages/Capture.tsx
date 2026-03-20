@@ -450,9 +450,9 @@ const Capture = () => {
                     <div className="aspect-[4/3] bg-muted flex items-center justify-center">
                       <div className="text-center">
                         <Sparkles className="w-12 h-12 text-primary mx-auto mb-3 animate-pulse" />
-                        <p className="font-medium">Creating your vision...</p>
+                        <p className="font-medium">{t('capture.vision.loading')}</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          AI is imagining your transformed space
+                          {t('capture.vision.sub')}
                         </p>
                         {visionLoadingTooLong && (
                           <div className="mt-4 space-y-2">
@@ -470,7 +470,7 @@ const Capture = () => {
                                 toast("Vision skipped — your challenges are ready!");
                               }}
                             >
-                              Skip vision, start challenges →
+                              {t('capture.skip.vision')}
                             </Button>
                           </div>
                         )}
