@@ -1012,66 +1012,64 @@ const ChallengePage = () => {
                     Done!
                   </Button>
                 </div>
-
-                {/* Progress photo — dashed tertiary */}
-                {!praiseData ? (
-                  showProgressUpload ? (
-                    <div className="mt-3">
-                      <ProgressPhotoUpload
-                        roomId={roomId!}
-                        roomName={room.name}
-                        intent={room.intent}
-                        beforeImageUrl={room.before_image_url ?? ""}
-                        completedChallenges={completedCount}
-                        totalChallenges={challenges.length}
-                        isGuest={isGuest}
-                        onPraiseReceived={handlePraiseReceived}
-                      />
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setShowProgressUpload(true)}
-                      className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm bg-primary/10 text-primary border border-primary/25 hover:bg-primary/15 hover:border-primary/40 active:scale-95 transition-all duration-150 mt-3"
-                    >
-                      <Camera className="w-4 h-4" />
-                      Upload progress photo
-                      <span className="ml-1 text-xs font-normal text-primary/60">· earn bonus pts</span>
-                    </button>
-                  )
-                ) : (
-                  <div className="space-y-3 mt-3">
-                    <PraiseCard
-                      praise={praiseData.praise}
-                      bonusPoints={praiseData.bonusPoints}
-                      progressLabel={praiseData.progressLabel}
-                      isVisible={true}
-                    />
-                    {!showShareCard ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full gap-2"
-                        onClick={handleShowShareCard}
-                      >
-                        <Share2 className="w-4 h-4" />
-                        Create shareable card
-                      </Button>
-                    ) : (
-                      <ShareCard
-                        beforeImageUrl={room.before_image_url ?? ""}
-                        wipImageUrl={praiseData.wipImageUrl}
-                        shareTagline={praiseData.shareTagline}
-                        shareReactionPill={praiseData.shareReactionPill}
-                        shareSub={praiseData.shareSub}
-                        sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
-                        roomName={room.name}
-                        roomId={roomId}
-                      />
-                    )}
-                  </div>
-                )}
               </CardContent>
             </Card>
+
+            {/* Progress photo — outside the task card */}
+            {!praiseData ? (
+              showProgressUpload ? (
+                <ProgressPhotoUpload
+                  roomId={roomId!}
+                  roomName={room.name}
+                  intent={room.intent}
+                  beforeImageUrl={room.before_image_url ?? ""}
+                  completedChallenges={completedCount}
+                  totalChallenges={challenges.length}
+                  isGuest={isGuest}
+                  onPraiseReceived={handlePraiseReceived}
+                />
+              ) : (
+                <button
+                  onClick={() => setShowProgressUpload(true)}
+                  className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm bg-primary/10 text-primary border border-primary/25 hover:bg-primary/15 hover:border-primary/40 active:scale-95 transition-all duration-150 mt-1"
+                >
+                  <Camera className="w-4 h-4" />
+                  Upload progress photo
+                  <span className="ml-1 text-xs font-normal text-primary/60">· earn bonus pts</span>
+                </button>
+              )
+            ) : (
+              <div className="space-y-3 mt-1">
+                <PraiseCard
+                  praise={praiseData.praise}
+                  bonusPoints={praiseData.bonusPoints}
+                  progressLabel={praiseData.progressLabel}
+                  isVisible={true}
+                />
+                {!showShareCard ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-2"
+                    onClick={handleShowShareCard}
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Create shareable card
+                  </Button>
+                ) : (
+                  <ShareCard
+                    beforeImageUrl={room.before_image_url ?? ""}
+                    wipImageUrl={praiseData.wipImageUrl}
+                    shareTagline={praiseData.shareTagline}
+                    shareReactionPill={praiseData.shareReactionPill}
+                    shareSub={praiseData.shareSub}
+                    sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
+                    roomName={room.name}
+                    roomId={roomId}
+                  />
+                )}
+              </div>
+            )}
 
             {/* Hidden YouTube BGM iframe */}
             {musicOn && timerActive && (
