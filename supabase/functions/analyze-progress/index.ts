@@ -32,18 +32,21 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Auth detection
+    // Auth detection — use getUser() for cryptographic server-side verification
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: { headers: { Authorization: authHeader } },
-      });
       const token = authHeader.replace("Bearer ", "");
-      const { data, error } = await supabase.auth.getClaims(token);
-      if (!error && data?.claims?.sub) {
-        userId = data.claims.sub;
+      // Skip anon key tokens (guest requests) — only verify real user JWTs
+      if (token !== SUPABASE_ANON_KEY) {
+        const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          global: { headers: { Authorization: authHeader } },
+        });
+        const { data: { user }, error } = await supabaseAuth.auth.getUser(token);
+        if (!error && user?.id) {
+          userId = user.id;
+        }
       }
     }
 
