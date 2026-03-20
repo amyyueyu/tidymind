@@ -525,7 +525,7 @@ const ShareCard = ({
 
     draw().catch(console.error);
     return () => { cancelled = true; };
-  }, [beforeImageUrl, wipImageUrl, shareTagline, fontsLoaded]);
+  }, [beforeImageUrl, wipImageUrl, shareTagline, fastestTaskSecs, fastestTaskTitle, estimatedTaskMins, fontsLoaded]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
