@@ -272,6 +272,19 @@ const ChallengePage = () => {
     }
   }, []);
 
+  // Send play/pause commands to the YouTube iframe via postMessage
+  // (works after the iframe is unlocked by the initial user-gesture mount)
+  const sendYouTubeCommand = useCallback((func: "playVideo" | "pauseVideo") => {
+    try {
+      musicIframeRef.current?.contentWindow?.postMessage(
+        JSON.stringify({ event: "command", func, args: [] }),
+        "*"
+      );
+    } catch {
+      // cross-origin errors are safe to ignore
+    }
+  }, []);
+
   const startTimer = useCallback(() => {
     stopInterval();
     const idx = challengeIndexRef.current;
@@ -283,6 +296,7 @@ const ChallengePage = () => {
     setTimerStarted(true);
     setChallengeStartTime(Date.now());
     acquireWakeLock();
+    sendYouTubeCommand("playVideo");
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -294,17 +308,19 @@ const ChallengePage = () => {
         setTimerActive(false);
         setTimeRemaining(0);
         releaseWakeLock();
+        sendYouTubeCommand("pauseVideo");
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
       }
     }, 1000);
-  }, [stopInterval]);
+  }, [stopInterval, sendYouTubeCommand]);
 
   const resumeTimer = useCallback(() => {
     stopInterval();
     setTimerActive(true);
     acquireWakeLock();
+    sendYouTubeCommand("playVideo");
     let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -316,18 +332,20 @@ const ChallengePage = () => {
         setTimerActive(false);
         setTimeRemaining(0);
         releaseWakeLock();
+        sendYouTubeCommand("pauseVideo");
         toast("⏰ Time's up! How did it go?");
       } else {
         setTimeRemaining(remaining);
       }
     }, 1000);
-  }, [stopInterval]);
+  }, [stopInterval, sendYouTubeCommand]);
 
   const pauseTimer = useCallback(() => {
     stopInterval();
     setTimerActive(false);
     releaseWakeLock();
-  }, [stopInterval]);
+    sendYouTubeCommand("pauseVideo");
+  }, [stopInterval, sendYouTubeCommand]);
 
   const fetchRoomData = async () => {
     setLoading(true);
@@ -1071,12 +1089,14 @@ const ChallengePage = () => {
               </div>
             )}
 
-            {/* Hidden YouTube BGM iframe */}
-            {musicOn && timerActive && (
+            {/* Hidden YouTube BGM iframe
+                Mount as soon as musicOn=true (during the user's gesture) so iOS Safari
+                grants autoplay permission. Play/pause is then controlled via postMessage. */}
+            {musicOn && (
               <iframe
                 key={`music-${musicVibe}-${musicKey}`}
                 ref={musicIframeRef}
-                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}`}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}&enablejsapi=1`}
                 allow="autoplay; encrypted-media"
                 allowFullScreen={false}
                 style={{ display: "none", position: "absolute", width: 0, height: 0, border: "none" }}
