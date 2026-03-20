@@ -431,12 +431,12 @@ const Capture = () => {
             {analyzing ? (
               <span className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                AI is analyzing your space...
+                {t('capture.analyzing')}
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
-                Create My Challenges
+                {t('capture.analyze.btn')}
               </span>
             )}
           </Button>
