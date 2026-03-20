@@ -1023,7 +1023,7 @@ const ChallengePage = () => {
                     onClick={skipChallenge}
                   >
                     <SkipForward className="w-3.5 h-3.5" />
-                    Skip
+                    {t('challenge.skip.btn')}
                   </button>
                   <Button
                     className="flex-[2] h-14 text-base font-bold gap-2 rounded-2xl"
@@ -1031,7 +1031,7 @@ const ChallengePage = () => {
                     onClick={completeChallenge}
                   >
                     <Check className="w-5 h-5" />
-                    Done!
+                    {t('challenge.done.btn')}
                   </Button>
                 </div>
               </CardContent>
