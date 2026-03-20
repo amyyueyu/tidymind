@@ -313,6 +313,7 @@ const ChallengePage = () => {
     if (!currentChallenge || !room) return;
     stopInterval();
     setTimerActive(false);
+    setTimerStarted(false);
 
     // Calculate actual time spent
     const actualSecs = challengeStartTime
