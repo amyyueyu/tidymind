@@ -16,8 +16,8 @@ import {
   Pause,
   Check,
   SkipForward,
+  RotateCcw,
   Star,
-  Clock,
   Trophy,
   Sparkles,
   Eye,
@@ -26,10 +26,12 @@ import {
   FastForward,
   UserPlus,
   Camera,
-  Download,
   Share2,
   Music2,
 } from "lucide-react";
+
+// Circumference for r=70 SVG ring
+const CIRCUMFERENCE = 2 * Math.PI * 70;
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
 import PraiseCard from "@/components/PraiseCard";
