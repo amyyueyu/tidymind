@@ -72,17 +72,39 @@ const Capture = () => {
     }
   }, [user, authLoading, sessionUsed, analysisComplete, navigate]);
 
+  // Compress image to max 1024px wide and quality 0.8 before storing
+  const compressImage = (dataUrl: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1024;
+        const scale = img.width > MAX ? MAX / img.width : 1;
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = () => resolve(dataUrl); // fallback: use original
+      img.src = dataUrl;
+    });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        setImagePreview(ev.target?.result as string);
+      reader.onload = async (ev) => {
+        const raw = ev.target?.result as string;
+        const compressed = await compressImage(raw);
+        setImagePreview(compressed);
         analytics.photoUploaded({ room_type: intent });
       };
       reader.readAsDataURL(file);
     }
   };
+
 
   // Upload a base64 data URL to storage and return the public URL
   const uploadImageToStorage = async (dataUrl: string): Promise<string> => {
