@@ -1007,12 +1007,12 @@ const ChallengePage = () => {
                     <p className="text-xs text-primary mt-2.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block flex-shrink-0" />
                       {timerActive
-                        ? `${musicVibe} · playing while timer runs`
-                        : `${musicVibe} · will play when timer starts`}
+                        ? `${musicVibe} · ${t('challenge.music.playing')}`
+                        : `${musicVibe} · ${t('challenge.music.waiting')}`}
                     </p>
                   )}
                   {!musicOn && (
-                    <p className="text-xs text-muted-foreground mt-2.5">Add rhythm to your countdown</p>
+                    <p className="text-xs text-muted-foreground mt-2.5">{t('challenge.music.sub')}</p>
                   )}
                 </div>
 
