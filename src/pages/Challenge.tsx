@@ -46,6 +46,7 @@ interface Challenge {
   points: number;
   status: string;
   sort_order: number;
+  actual_seconds?: number | null;
 }
 
 interface Room {
@@ -78,6 +79,7 @@ const ChallengePage = () => {
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [challengeStartTime, setChallengeStartTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [loading, setLoading] = useState(true);
   const [showVision, setShowVision] = useState(false);
@@ -156,6 +158,7 @@ const ChallengePage = () => {
     const startTime = ch.time_estimate_minutes * 60;
     setTimeRemaining(startTime);
     setTimerActive(true);
+    setChallengeStartTime(Date.now());
     let remaining = startTime;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
@@ -229,6 +232,16 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
 
+    // Calculate actual time spent
+    const actualSecs = challengeStartTime
+      ? Math.round((Date.now() - challengeStartTime) / 1000)
+      : 0;
+    setChallengeStartTime(null);
+
+    // Detect "finished early" (< 60% of estimated time, and timer was actually started)
+    const estimatedSecs = currentChallenge.time_estimate_minutes * 60;
+    const finishedEarly = actualSecs > 0 && actualSecs < estimatedSecs * 0.6;
+
     const newCompletedCount = completedCount + 1;
     const isLast = currentChallengeIndex === challenges.length - 1;
 
@@ -240,9 +253,9 @@ const ChallengePage = () => {
 
     if (isGuest) {
       // Guest: update context only
-      updateGuestChallenge(currentChallenge.id, { status: "completed" });
+      updateGuestChallenge(currentChallenge.id, { status: "completed", actual_seconds: actualSecs || undefined });
       setChallenges((prev) =>
-        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed" } : c))
+        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed", actual_seconds: actualSecs || null } : c))
       );
       updateGuestRoom({
         completed_challenges: newCompletedCount,
@@ -257,11 +270,19 @@ const ChallengePage = () => {
             }
           : prev
       );
-      toast(`✓ Nice work! (${currentChallenge.points} pts — save your progress to keep them)`);
+      if (finishedEarly) {
+        const saved = estimatedSecs - actualSecs;
+        const savedMins = Math.floor(saved / 60);
+        const savedSecs = saved % 60;
+        const savedStr = savedMins > 0 ? `${savedMins}m ${savedSecs}s` : `${saved}s`;
+        toast(`⚡ You did that in ${savedStr} less than expected! (${currentChallenge.points} pts — save your progress to keep them)`);
+      } else {
+        toast(`✓ Nice work! (${currentChallenge.points} pts — save your progress to keep them)`);
+      }
     } else {
       await supabase
         .from("challenges")
-        .update({ status: "completed", completed_at: new Date().toISOString() })
+        .update({ status: "completed", completed_at: new Date().toISOString(), actual_seconds: actualSecs || null })
         .eq("id", currentChallenge.id);
       await addPoints(currentChallenge.points, currentChallenge.id);
       await supabase
@@ -273,9 +294,19 @@ const ChallengePage = () => {
             : {}),
         })
         .eq("id", room.id);
-      toast.success(`+${currentChallenge.points} points! 🎉`);
+
+      if (finishedEarly) {
+        const saved = estimatedSecs - actualSecs;
+        const savedMins = Math.floor(saved / 60);
+        const savedSecs = saved % 60;
+        const savedStr = savedMins > 0 ? `${savedMins}m ${savedSecs}s` : `${saved}s`;
+        toast.success(`⚡ You did that in ${savedStr} less than expected!`, { duration: 4000 });
+      } else {
+        toast.success(`+${currentChallenge.points} points! 🎉`);
+      }
+
       setChallenges((prev) =>
-        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed" } : c))
+        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed", actual_seconds: actualSecs || null } : c))
       );
     }
 
@@ -394,6 +425,15 @@ const ChallengePage = () => {
 
   // Session complete screen
   if (!room || allDone || sessionComplete) {
+    // Compute fastest challenge that was finished early
+    const fastestChallenge = challenges
+      .filter((c) => c.status === "completed" && c.actual_seconds != null && c.actual_seconds > 0)
+      .sort((a, b) => (a.actual_seconds ?? 999999) - (b.actual_seconds ?? 999999))[0];
+    const fastestWasEarly =
+      fastestChallenge &&
+      fastestChallenge.actual_seconds != null &&
+      fastestChallenge.actual_seconds < fastestChallenge.time_estimate_minutes * 60 * 0.6;
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="text-center max-w-sm w-full space-y-6">
@@ -407,6 +447,16 @@ const ChallengePage = () => {
                 ? "You just completed a full declutter session. Imagine what you could do with streaks, points, and your progress saved."
                 : "You've completed all challenges for this space!"}
             </p>
+            {fastestWasEarly && fastestChallenge && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 rounded-lg p-3 mt-3 text-left">
+                <span className="text-lg">⚡</span>
+                <span>
+                  Fastest task: <strong>{fastestChallenge.title}</strong>
+                  {" "}in {fastestChallenge.actual_seconds}s
+                  {" "}(estimated {fastestChallenge.time_estimate_minutes} min)
+                </span>
+              </div>
+            )}
           </div>
 
           {isGuest ? (
@@ -491,6 +541,9 @@ const ChallengePage = () => {
                       sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
                       roomName={room?.name ?? "My Space"}
                       roomId={roomId}
+                      fastestTaskSecs={fastestWasEarly && fastestChallenge?.actual_seconds ? fastestChallenge.actual_seconds : undefined}
+                      fastestTaskTitle={fastestWasEarly ? fastestChallenge?.title : undefined}
+                      estimatedTaskMins={fastestWasEarly ? fastestChallenge?.time_estimate_minutes : undefined}
                     />
                   )}
                 </div>

@@ -14,6 +14,9 @@ interface ShareCardProps {
   sessionMinutes: number;
   roomName: string;
   roomId?: string;
+  fastestTaskSecs?: number;
+  fastestTaskTitle?: string;
+  estimatedTaskMins?: number;
 }
 
 const CANVAS_W = 1080;
@@ -249,6 +252,9 @@ const ShareCard = ({
   wipImageUrl,
   shareTagline,
   roomId,
+  fastestTaskSecs,
+  fastestTaskTitle,
+  estimatedTaskMins,
 }: ShareCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(true);
@@ -461,7 +467,38 @@ const ShareCard = ({
         ctx.fill();
       }
 
-      // ─── 9. Footer ───────────────────────────────────────────────────────────
+      // ─── 8b. Fastest task badge (if finished early) ──────────────────────────
+      if (fastestTaskSecs && fastestTaskTitle && estimatedTaskMins) {
+        const saved = estimatedTaskMins * 60 - fastestTaskSecs;
+        const savedMins = Math.floor(saved / 60);
+        const savedSecs = saved % 60;
+        const savedStr = savedMins > 0 ? `${savedMins}m ${savedSecs}s` : `${saved}s`;
+        const badgeText = `⚡ Fastest task: "${fastestTaskTitle}" — ${savedStr} under time`;
+
+        const badgeY = captionStartY + captionLines.length * lineH + 28;
+        ctx.font = "600 22px 'Nunito', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,255,255,0.75)";
+
+        // Pill background
+        const textW = ctx.measureText(badgeText).width;
+        const pillPad = 24;
+        const pillH = 44;
+        const pillX = CANVAS_W / 2 - textW / 2 - pillPad;
+        const pillW = textW + pillPad * 2;
+        ctx.save();
+        roundRectPath(ctx, pillX, badgeY - pillH / 2 - 4, pillW, pillH, 22);
+        ctx.fillStyle = "rgba(42, 92, 53, 0.55)";
+        ctx.fill();
+        ctx.restore();
+
+        ctx.font = "600 22px 'Nunito', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255,255,255,0.90)";
+        ctx.fillText(badgeText, CANVAS_W / 2, badgeY + 4);
+      }
+
+
       const footerY = cardY + cardH - 66;
 
       // Thin footer divider
@@ -519,7 +556,7 @@ const ShareCard = ({
 
     draw().catch(console.error);
     return () => { cancelled = true; };
-  }, [beforeImageUrl, wipImageUrl, shareTagline, fontsLoaded]);
+  }, [beforeImageUrl, wipImageUrl, shareTagline, fastestTaskSecs, fastestTaskTitle, estimatedTaskMins, fontsLoaded]);
 
   const handleDownload = () => {
     const canvas = canvasRef.current;
