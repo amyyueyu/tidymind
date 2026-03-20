@@ -232,6 +232,16 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
 
+    // Calculate actual time spent
+    const actualSecs = challengeStartTime
+      ? Math.round((Date.now() - challengeStartTime) / 1000)
+      : 0;
+    setChallengeStartTime(null);
+
+    // Detect "finished early" (< 60% of estimated time, and timer was actually started)
+    const estimatedSecs = currentChallenge.time_estimate_minutes * 60;
+    const finishedEarly = actualSecs > 0 && actualSecs < estimatedSecs * 0.6;
+
     const newCompletedCount = completedCount + 1;
     const isLast = currentChallengeIndex === challenges.length - 1;
 
@@ -243,9 +253,9 @@ const ChallengePage = () => {
 
     if (isGuest) {
       // Guest: update context only
-      updateGuestChallenge(currentChallenge.id, { status: "completed" });
+      updateGuestChallenge(currentChallenge.id, { status: "completed", actual_seconds: actualSecs || undefined });
       setChallenges((prev) =>
-        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed" } : c))
+        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed", actual_seconds: actualSecs || null } : c))
       );
       updateGuestRoom({
         completed_challenges: newCompletedCount,
@@ -260,11 +270,19 @@ const ChallengePage = () => {
             }
           : prev
       );
-      toast(`✓ Nice work! (${currentChallenge.points} pts — save your progress to keep them)`);
+      if (finishedEarly) {
+        const saved = estimatedSecs - actualSecs;
+        const savedMins = Math.floor(saved / 60);
+        const savedSecs = saved % 60;
+        const savedStr = savedMins > 0 ? `${savedMins}m ${savedSecs}s` : `${saved}s`;
+        toast(`⚡ You did that in ${savedStr} less than expected! (${currentChallenge.points} pts — save your progress to keep them)`);
+      } else {
+        toast(`✓ Nice work! (${currentChallenge.points} pts — save your progress to keep them)`);
+      }
     } else {
       await supabase
         .from("challenges")
-        .update({ status: "completed", completed_at: new Date().toISOString() })
+        .update({ status: "completed", completed_at: new Date().toISOString(), actual_seconds: actualSecs || null })
         .eq("id", currentChallenge.id);
       await addPoints(currentChallenge.points, currentChallenge.id);
       await supabase
@@ -276,9 +294,19 @@ const ChallengePage = () => {
             : {}),
         })
         .eq("id", room.id);
-      toast.success(`+${currentChallenge.points} points! 🎉`);
+
+      if (finishedEarly) {
+        const saved = estimatedSecs - actualSecs;
+        const savedMins = Math.floor(saved / 60);
+        const savedSecs = saved % 60;
+        const savedStr = savedMins > 0 ? `${savedMins}m ${savedSecs}s` : `${saved}s`;
+        toast.success(`⚡ You did that in ${savedStr} less than expected!`, { duration: 4000 });
+      } else {
+        toast.success(`+${currentChallenge.points} points! 🎉`);
+      }
+
       setChallenges((prev) =>
-        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed" } : c))
+        prev.map((c, i) => (i === currentChallengeIndex ? { ...c, status: "completed", actual_seconds: actualSecs || null } : c))
       );
     }
 
