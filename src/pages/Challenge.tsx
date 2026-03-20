@@ -28,6 +28,7 @@ import {
   Camera,
   Download,
   Share2,
+  Music,
 } from "lucide-react";
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
@@ -37,6 +38,48 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
 import { useConfetti } from "@/hooks/useConfetti";
+
+// ─── Audio helpers ─────────────────────────────────────────────────────────────
+function playTone(
+  type: OscillatorType,
+  frequency: number,
+  duration: number,
+  gain = 0.15
+) {
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gainNode.gain.setValueAtTime(gain, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch {
+    // Audio not available — fail silently
+  }
+}
+
+function playDoneSound() {
+  playTone("sine", 523, 0.15); // C5
+  setTimeout(() => playTone("sine", 659, 0.25), 120); // E5
+}
+
+function playEarlyFinishSound() {
+  playTone("sine", 523, 0.1);
+  setTimeout(() => playTone("sine", 659, 0.1), 80);
+  setTimeout(() => playTone("sine", 784, 0.2), 160); // G5
+}
+
+// ─── YouTube BGM playlists ──────────────────────────────────────────────────────
+const MUSIC_PLAYLISTS: Record<string, string> = {
+  focus:  "jfKfPfyJRdk", // lofi hip hop — beats to relax/study
+  calm:   "5qap5aO4i9A", // lofi hip hop — beats to sleep/chill
+  energy: "DWcJFNfaw9c", // lofi hip hop — beats to work/game
+};
 
 interface Challenge {
   id: string;
@@ -84,6 +127,12 @@ const ChallengePage = () => {
   const [loading, setLoading] = useState(true);
   const [showVision, setShowVision] = useState(false);
   const [sessionComplete, setSessionComplete] = useState(false);
+
+  // Music state
+  const [musicOn, setMusicOn] = useState(false);
+  const [musicVibe, setMusicVibe] = useState<"focus" | "calm" | "energy">("focus");
+
+  const toggleMusic = () => setMusicOn((prev) => !prev);
 
   // Progress photo & sharing state
   const [showProgressUpload, setShowProgressUpload] = useState(false);
@@ -241,6 +290,13 @@ const ChallengePage = () => {
     // Detect "finished early" (< 60% of estimated time, and timer was actually started)
     const estimatedSecs = currentChallenge.time_estimate_minutes * 60;
     const finishedEarly = actualSecs > 0 && actualSecs < estimatedSecs * 0.6;
+
+    // Play sound effect
+    if (finishedEarly) {
+      playEarlyFinishSound();
+    } else {
+      playDoneSound();
+    }
 
     const newCompletedCount = completedCount + 1;
     const isLast = currentChallengeIndex === challenges.length - 1;
@@ -795,6 +851,35 @@ const ChallengePage = () => {
               )}
             </div>
 
+            {/* Music toggle */}
+            <div className="flex items-center justify-center gap-3 py-1 animate-fade-in">
+              <button
+                onClick={toggleMusic}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Music className={cn("w-3.5 h-3.5", musicOn && "text-primary")} />
+                {musicOn ? "Music on" : "Add music"}
+              </button>
+              {musicOn && (
+                <div className="flex gap-1">
+                  {(["focus", "calm", "energy"] as const).map((vibe) => (
+                    <button
+                      key={vibe}
+                      onClick={() => setMusicVibe(vibe)}
+                      className={cn(
+                        "text-xs px-2 py-0.5 rounded-full border transition-colors",
+                        musicVibe === vibe
+                          ? "border-primary text-primary bg-primary/5"
+                          : "border-border text-muted-foreground"
+                      )}
+                    >
+                      {vibe}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className="flex gap-3 animate-fade-in">
               <Button variant="outline" className="flex-1 h-14" onClick={skipChallenge}>
@@ -806,6 +891,17 @@ const ChallengePage = () => {
                 Done!
               </Button>
             </div>
+
+            {/* Hidden YouTube BGM iframe — only mounted after explicit user opt-in */}
+            {musicOn && (
+              <iframe
+                key={musicVibe}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0`}
+                allow="autoplay"
+                style={{ display: "none" }}
+                title="background music"
+              />
+            )}
           </>
         )}
       </main>
