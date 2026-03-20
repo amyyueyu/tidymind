@@ -936,13 +936,15 @@ const ChallengePage = () => {
               </Button>
             </div>
 
-            {/* Hidden YouTube BGM iframe — only mounted after explicit user opt-in */}
-            {musicOn && (
+            {/* Hidden YouTube BGM iframe — mounted only when music on AND timer active (Bug 3 fix) */}
+            {musicOn && timerActive && (
               <iframe
-                key={musicVibe}
-                src={`https://www.youtube.com/embed/${MUSIC_VIBES.find((v) => v.id === musicVibe)?.youtubeId}?autoplay=1&mute=0`}
-                allow="autoplay"
-                style={{ display: "none" }}
+                key={`music-${musicVibe}-${musicKey}`}
+                ref={musicIframeRef}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0&controls=0&loop=1&playlist=${MUSIC_PLAYLISTS[musicVibe]}`}
+                allow="autoplay; encrypted-media"
+                allowFullScreen={false}
+                style={{ display: "none", position: "absolute", width: 0, height: 0, border: "none" }}
                 title="background music"
               />
             )}
