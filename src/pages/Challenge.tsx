@@ -901,6 +901,11 @@ const ChallengePage = () => {
                     </div>
                   </div>
                 </div>
+                {timerActive && wakeLockRef.current && (
+                  <p className="text-xs text-muted-foreground text-center -mt-2 mb-1">
+                    Screen will stay on during session
+                  </p>
+                )}
 
                 {/* Music section */}
                 <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-5 text-left">
