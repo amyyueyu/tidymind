@@ -131,6 +131,7 @@ const ChallengePage = () => {
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [challengeStartTime, setChallengeStartTime] = useState<number | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -162,10 +163,12 @@ const ChallengePage = () => {
   const challengesRef = useRef<Challenge[]>([]);
   const challengeIndexRef = useRef(0);
   const guestHydratedRoomIdRef = useRef<string | null>(null);
+  const timeRemainingRef = useRef(0);
 
   // Keep refs in sync with state on every render
   challengesRef.current = challenges;
   challengeIndexRef.current = currentChallengeIndex;
+  timeRemainingRef.current = timeRemaining;
 
   // Auth guard
   useEffect(() => {
@@ -217,8 +220,29 @@ const ChallengePage = () => {
     const startTime = ch.time_estimate_minutes * 60;
     setTimeRemaining(startTime);
     setTimerActive(true);
+    setTimerStarted(true);
     setChallengeStartTime(Date.now());
     let remaining = startTime;
+    intervalRef.current = setInterval(() => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+        setTimerActive(false);
+        setTimeRemaining(0);
+        toast("⏰ Time's up! How did it go?");
+      } else {
+        setTimeRemaining(remaining);
+      }
+    }, 1000);
+  }, [stopInterval]);
+
+  const resumeTimer = useCallback(() => {
+    stopInterval();
+    setTimerActive(true);
+    let remaining = timeRemainingRef.current;
     intervalRef.current = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
@@ -290,6 +314,7 @@ const ChallengePage = () => {
     if (!currentChallenge || !room) return;
     stopInterval();
     setTimerActive(false);
+    setTimerStarted(false);
 
     // Calculate actual time spent
     const actualSecs = challengeStartTime
@@ -393,6 +418,7 @@ const ChallengePage = () => {
     if (!currentChallenge) return;
     stopInterval();
     setTimerActive(false);
+    setTimerStarted(false);
 
     if (isGuest) {
       updateGuestChallenge(currentChallenge.id, { status: "skipped" });
@@ -421,6 +447,7 @@ const ChallengePage = () => {
     if (challenge.status === "completed") return;
     stopInterval();
     setTimerActive(false);
+    setTimerStarted(false);
     setCurrentChallengeIndex(index);
     setTimeRemaining(challenge.time_estimate_minutes * 60);
   };
@@ -833,12 +860,12 @@ const ChallengePage = () => {
                 </div>
 
                 <div className="flex justify-center gap-3">
-                    {!timerActive ? (
+                    {!timerStarted ? (
                       <Button type="button" onClick={startTimer} size="lg" className="gap-2">
                         <Play className="w-5 h-5" />
                         Start Timer
                       </Button>
-                    ) : (
+                    ) : timerActive ? (
                       <Button
                         type="button"
                         onClick={pauseTimer}
@@ -849,6 +876,17 @@ const ChallengePage = () => {
                         <Pause className="w-5 h-5" />
                         Pause
                       </Button>
+                    ) : (
+                      <>
+                        <Button type="button" onClick={resumeTimer} size="lg" className="gap-2">
+                          <Play className="w-5 h-5" />
+                          Continue
+                        </Button>
+                        <Button type="button" onClick={startTimer} variant="outline" size="lg" className="gap-2">
+                          <SkipForward className="w-5 h-5" />
+                          Restart
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
