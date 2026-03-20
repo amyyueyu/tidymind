@@ -729,7 +729,7 @@ const ChallengePage = () => {
                   )}
                 </div>
               )}
-              <Button onClick={() => navigate("/")}>Back to Home</Button>
+              <Button onClick={() => navigate("/")}>{t('challenge.back.home')}</Button>
             </div>
           )}
         </div>
