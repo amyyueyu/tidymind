@@ -134,9 +134,7 @@ const ChallengePage = () => {
 
   // Music state
   const [musicOn, setMusicOn] = useState(false);
-  const [musicVibe, setMusicVibe] = useState<"focus" | "calm" | "energy">("focus");
-
-  const toggleMusic = () => setMusicOn((prev) => !prev);
+  const [musicVibe, setMusicVibe] = useState<MusicVibeId>("lofi-focus");
 
   // Progress photo & sharing state
   const [showProgressUpload, setShowProgressUpload] = useState(false);
