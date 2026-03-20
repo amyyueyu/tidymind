@@ -235,8 +235,8 @@ const Auth = () => {
           </div>
  
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-              <Leaf className="w-8 h-8 text-primary" />
+            <div className="inline-flex items-center justify-center mb-4">
+              <img src={logoImg} alt="TidyMate logo" className="w-20 h-20 rounded-3xl" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">TidyMate</h1>
             <p className="text-muted-foreground mt-2">
