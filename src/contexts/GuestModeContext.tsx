@@ -8,6 +8,7 @@ export interface GuestChallenge {
   points: number;
   status: "pending" | "completed" | "skipped";
   sort_order: number;
+  actual_seconds?: number | null;
 }
 
 export interface GuestRoom {
