@@ -28,7 +28,7 @@ import {
   Camera,
   Download,
   Share2,
-  Music,
+  Music2,
 } from "lucide-react";
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
