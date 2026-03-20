@@ -18,12 +18,15 @@ import {
   Palette,
 } from "lucide-react";
 import { analytics } from "@/lib/analytics";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
 type Intent = "tidy" | "declutter" | "redesign";
 
 const Capture = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLang();
   const { isGuest: isGuestRaw, setGuestSession, sessionUsed, markSessionUsed, clearGuestSession } = useGuestMode();
   // If the user is authenticated, never treat them as a guest (clears stale sessionStorage)
   const isGuest = isGuestRaw && !user;
@@ -310,9 +313,9 @@ const Capture = () => {
   };
 
   const intentOptions = [
-    { value: "tidy" as Intent, label: "Tidy Up", description: "Put things back in their places", icon: Sparkles },
-    { value: "declutter" as Intent, label: "Declutter", description: "Remove items you don't need", icon: Trash2 },
-    { value: "redesign" as Intent, label: "Redesign", description: "Reorganize for better flow", icon: Palette },
+    { value: "tidy" as Intent, label: t('capture.tidy'), description: t('capture.tidy.sub'), icon: Sparkles },
+    { value: "declutter" as Intent, label: t('capture.declutter'), description: t('capture.declutter.sub'), icon: Trash2 },
+    { value: "redesign" as Intent, label: t('capture.redesign'), description: t('capture.redesign.sub'), icon: Palette },
   ];
 
   if (authLoading) return null;
@@ -327,13 +330,15 @@ const Capture = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Leaf className="w-5 h-5 text-primary" />
-            <span className="font-semibold">Capture Space</span>
+            <span className="font-semibold">{t('capture.title')}</span>
           </div>
           {isGuest && (
             <span className="ml-auto text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-              Guest preview
+              {t('capture.guest.badge')}
             </span>
           )}
+          {!isGuest && <span className="ml-auto"><LangToggle /></span>}
+          {isGuest && <LangToggle />}
         </div>
       </header>
 
@@ -386,7 +391,7 @@ const Capture = () => {
 
         {/* Intent Selection */}
         <div className="space-y-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <h2 className="font-semibold">What would you like to do?</h2>
+          <h2 className="font-semibold">{t('capture.intent.label')}</h2>
           <RadioGroup value={intent} onValueChange={(v) => setIntent(v as Intent)}>
             <div className="grid gap-3">
               {intentOptions.map((option) => (
@@ -426,12 +431,12 @@ const Capture = () => {
             {analyzing ? (
               <span className="flex items-center gap-2">
                 <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                AI is analyzing your space...
+                {t('capture.analyzing')}
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
-                Create My Challenges
+                {t('capture.analyze.btn')}
               </span>
             )}
           </Button>
@@ -445,9 +450,9 @@ const Capture = () => {
                     <div className="aspect-[4/3] bg-muted flex items-center justify-center">
                       <div className="text-center">
                         <Sparkles className="w-12 h-12 text-primary mx-auto mb-3 animate-pulse" />
-                        <p className="font-medium">Creating your vision...</p>
+                        <p className="font-medium">{t('capture.vision.loading')}</p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          AI is imagining your transformed space
+                          {t('capture.vision.sub')}
                         </p>
                         {visionLoadingTooLong && (
                           <div className="mt-4 space-y-2">
@@ -465,7 +470,7 @@ const Capture = () => {
                                 toast("Vision skipped — your challenges are ready!");
                               }}
                             >
-                              Skip vision, start challenges →
+                              {t('capture.skip.vision')}
                             </Button>
                           </div>
                         )}
@@ -522,10 +527,10 @@ const Capture = () => {
                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-primary/20 flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold text-lg mb-1">Challenges Ready! 🎉</h3>
+                <h3 className="font-semibold text-lg mb-1">{t('capture.ready.title')}</h3>
                 <p className="text-sm text-muted-foreground">
                   {generatingVision
-                    ? "Your vision is being created... You can start now or wait!"
+                    ? t('capture.ready.sub')
                     : visionImage
                     ? "Your vision is ready! Start your challenges to transform your space."
                     : "Let's start transforming your space!"}
@@ -538,7 +543,7 @@ const Capture = () => {
               onClick={proceedToChallenges}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              {generatingVision ? "Start While Vision Loads" : "Start My Challenges"}
+              {generatingVision ? t('capture.start.loading') : t('capture.start.btn')}
             </Button>
           </div>
         )}

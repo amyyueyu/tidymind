@@ -10,6 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/sonner";
 import { Sparkles, ArrowRight } from "lucide-react";
 import logoImg from "@/assets/logo.png";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 const beforeRoom = new URL("@/assets/before-room.jpg", import.meta.url).href;
 const afterRoom = new URL("@/assets/after-room.jpg", import.meta.url).href;
 const beforeBedroom = new URL("@/assets/before-bedroom.jpg", import.meta.url).href;
@@ -19,6 +21,7 @@ import { analytics, identifyUser } from "@/lib/analytics";
 const Auth = () => {
   const navigate = useNavigate();
   const { startGuestMode } = useGuestMode();
+  const { t } = useLang();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -90,7 +93,12 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-background">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background relative">
+      {/* Language toggle — top-right corner */}
+      <div className="absolute top-4 right-4 z-20">
+        <LangToggle />
+      </div>
+
       {/* Left Side - Showcase */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/5 via-primary/10 to-accent/10 p-8 items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
@@ -98,7 +106,7 @@ const Auth = () => {
         <div className="relative z-10 max-w-2xl w-full space-y-6">
           {/* Header */}
            <div className="text-center space-y-2">
-             <h2 className="text-2xl font-bold text-primary">See the Transformations</h2>
+             <h2 className="text-2xl font-bold text-primary">{t('landing.title')}</h2>
              
             </div>
           
@@ -106,7 +114,7 @@ const Auth = () => {
           <div className="space-y-5">
             {/* Living Room Transformation */}
             <div className="space-y-2">
-              <h3 className="text-xs font-medium text-muted-foreground">Living Room</h3>
+              <h3 className="text-xs font-medium text-muted-foreground">{t('landing.label.living')}</h3>
               <div className="flex items-center gap-3">
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-border/50">
                   <img
@@ -141,7 +149,7 @@ const Auth = () => {
             
             {/* Bedroom Transformation */}
             <div className="space-y-2">
-              <h3 className="text-xs font-medium text-muted-foreground">Bedroom</h3>
+              <h3 className="text-xs font-medium text-muted-foreground">{t('landing.label.bedroom')}</h3>
               <div className="flex items-center gap-3">
                 <div className="relative flex-1 rounded-xl overflow-hidden shadow-lg border border-border/50">
                   <img
@@ -178,29 +186,29 @@ const Auth = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 pt-2">
             <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">5 min</div>
-              <div className="text-xs text-muted-foreground">Micro-tasks</div>
+              <div className="text-xl font-bold text-primary">{t('landing.stat1.n')}</div>
+              <div className="text-xs text-muted-foreground">{t('landing.stat1.l')}</div>
             </div>
             <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">AI</div>
-              <div className="text-xs text-muted-foreground">Powered</div>
+              <div className="text-xl font-bold text-primary">{t('landing.stat2.n')}</div>
+              <div className="text-xs text-muted-foreground">{t('landing.stat2.l')}</div>
             </div>
             <div className="text-center p-2.5 rounded-xl bg-background/50 backdrop-blur-sm">
-              <div className="text-xl font-bold text-primary">ADHD</div>
-              <div className="text-xs text-muted-foreground">Friendly</div>
+              <div className="text-xl font-bold text-primary">{t('landing.stat3.n')}</div>
+              <div className="text-xs text-muted-foreground">{t('landing.stat3.l')}</div>
             </div>
           </div>
 
           {/* Account benefits nudge */}
           <div className="rounded-xl bg-background/60 backdrop-blur-sm border border-primary/20 p-4 space-y-2.5">
-            <p className="text-xs font-semibold text-primary uppercase tracking-wide">When you create an account</p>
+            <p className="text-xs font-semibold text-primary uppercase tracking-wide">{t('landing.benefits.title')}</p>
             <ul className="space-y-2">
               {[
-              "📈 Track your streak and watch your habit grow",
-              "🏆 Earn points and level up as you go",
-              "📸 Save every before & after — your visual record",
-              "🔁 Pick up exactly where you left off, every time"].
-              map((item) =>
+                t('landing.benefit1'),
+                t('landing.benefit2'),
+                t('landing.benefit3'),
+                t('landing.benefit4'),
+              ].map((item) =>
               <li key={item} className="flex items-start gap-2 text-xs text-foreground/80">
                   <span>{item}</span>
                 </li>
@@ -247,12 +255,10 @@ const Auth = () => {
           <Card className="border-0 shadow-lg">
             <CardHeader className="space-y-1 pb-4">
               <CardTitle className="text-2xl text-center">
-                {isLogin ? "Welcome back" : "Get started"}
+                {isLogin ? t('auth.welcome') : t('auth.start')}
               </CardTitle>
               <CardDescription className="text-center">
-                {isLogin ?
-                "Sign in to continue your journey" :
-                "Create an account to start decluttering"}
+                {isLogin ? t('auth.welcome.sub') : t('auth.start.sub')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -271,7 +277,7 @@ const Auth = () => {
                   </div>
                 }
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -283,7 +289,7 @@ const Auth = () => {
                   
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.password')}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -306,7 +312,7 @@ const Auth = () => {
                     </span> :
                   <span className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4" />
-                      {isLogin ? "Sign in" : "Create account"}
+                      {isLogin ? t('auth.signin.btn') : t('auth.create.btn')}
                     </span>
                   }
                 </Button>
@@ -332,7 +338,7 @@ const Auth = () => {
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                   </svg>
-                  Continue with Google
+                  {t('auth.google')}
                 </Button>
 
                 <div className="relative">
@@ -350,7 +356,7 @@ const Auth = () => {
                   className="w-full h-12 text-base font-medium border-primary/40 text-primary hover:bg-primary/5 hover:text-primary hover:border-primary gap-2"
                   onClick={handleGuestMode}>
                   <Sparkles className="w-4 h-4" />
-                  Try it without logging in
+                  {t('auth.guest')}
                 </Button>
               </form>
 
@@ -364,16 +370,17 @@ const Auth = () => {
                   }}
                   className="text-sm text-muted-foreground hover:text-primary transition-colors">
                   
-                  {isLogin ?
-                  "Don't have an account? Sign up" :
-                  "Already have an account? Sign in"}
+                  {isLogin ? t('auth.no.account') : t('auth.has.account')}
                 </button>
               </div>
             </CardContent>
           </Card>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
-            By continuing, you agree to our Terms of Service and Privacy Policy
+            {t('auth.tos')}{' '}
+            <span className="underline cursor-pointer">{t('auth.tos.terms')}</span>
+            {' '}{t('auth.tos.and')}{' '}
+            <span className="underline cursor-pointer">{t('auth.tos.privacy')}</span>
           </p>
         </div>
        </div>

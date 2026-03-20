@@ -43,6 +43,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
 import { useConfetti } from "@/hooks/useConfetti";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
 // ─── Audio helpers ─────────────────────────────────────────────────────────────
 function playTone(
@@ -122,6 +124,7 @@ const ChallengePage = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLang();
   const { addPoints } = useProfile();
   const { popChallenge, showerComplete, starBurst } = useConfetti();
   const {
@@ -618,12 +621,12 @@ const ChallengePage = () => {
           <div className="animate-fade-in">
             <Trophy className="w-16 h-16 text-primary mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">
-              {isGuest ? "You crushed it! 🎉" : "All Done! 🎉"}
+              {isGuest ? t('challenge.guest.title') : t('challenge.complete.title')}
             </h2>
             <p className="text-muted-foreground">
               {isGuest
-                ? "You just completed a full declutter session. Imagine what you could do with streaks, points, and your progress saved."
-                : "You've completed all challenges for this space!"}
+                ? t('challenge.guest.sub')
+                : t('challenge.complete.sub')}
             </p>
             {fastestWasEarly && fastestChallenge && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 rounded-lg p-3 mt-3 text-left">
@@ -641,9 +644,9 @@ const ChallengePage = () => {
             <Card className="border-0 shadow-lg bg-gradient-to-br from-primary/5 to-primary/10 animate-fade-in">
               <CardContent className="p-6 space-y-4">
                 <div className="space-y-1">
-                  <p className="font-semibold text-lg">Save your progress</p>
+                  <p className="font-semibold text-lg">{t('challenge.save.title')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Create a free account to track your streaks, earn points, and keep your transformation history.
+                    {t('challenge.save.sub')}
                   </p>
                 </div>
                 <Button
@@ -651,13 +654,13 @@ const ChallengePage = () => {
                   onClick={() => navigate("/auth?signup=1")}
                 >
                   <UserPlus className="w-5 h-5" />
-                  Create free account
+                  {t('challenge.create.btn')}
                 </Button>
                 <button
                   className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
                   onClick={() => navigate("/auth")}
                 >
-                  Sign in instead
+                  {t('challenge.signin.link')}
                 </button>
               </CardContent>
             </Card>
@@ -726,7 +729,7 @@ const ChallengePage = () => {
                   )}
                 </div>
               )}
-              <Button onClick={() => navigate("/")}>Back to Home</Button>
+              <Button onClick={() => navigate("/")}>{t('challenge.back.home')}</Button>
             </div>
           )}
         </div>
@@ -765,9 +768,10 @@ const ChallengePage = () => {
                 Save progress
               </Badge>
             ) : (
-              <Badge variant="secondary" className="shrink-0">
+              <Badge variant="secondary" className="shrink-0 flex items-center gap-1">
                 <Star className="w-3 h-3 mr-1" />
                 {currentChallenge?.points} pts
+                <span className="ml-1"><LangToggle /></span>
               </Badge>
             )}
           </div>
@@ -868,7 +872,7 @@ const ChallengePage = () => {
               <div className="bg-primary px-5 py-5 relative overflow-hidden">
                 <div className="absolute -top-12 -right-8 w-36 h-36 rounded-full bg-white/[0.06] pointer-events-none" />
                 <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1.5">
-                  Now doing
+                  {t('challenge.now.doing')}
                 </p>
                 <h2 className="font-black text-white text-xl leading-tight mb-2">
                   {currentChallenge.title}
@@ -914,7 +918,7 @@ const ChallengePage = () => {
                         {formatTime(timeRemaining)}
                       </span>
                       <span className="text-xs text-muted-foreground mt-1 font-medium">
-                        remaining
+                        {t('challenge.remaining')}
                       </span>
                     </div>
                   </div>
@@ -938,9 +942,9 @@ const ChallengePage = () => {
                     onClick={timerActive ? pauseTimer : (timerStarted ? resumeTimer : startTimer)}
                   >
                     {timerActive ? (
-                      <><Pause className="w-3.5 h-3.5" /> Pause</>
+                      <><Pause className="w-3.5 h-3.5" /> {t('challenge.pause.btn')}</>
                     ) : timerStarted ? (
-                      <><Play className="w-3.5 h-3.5" /> Continue</>
+                      <><Play className="w-3.5 h-3.5" /> {t('challenge.continue.btn')}</>
                     ) : (
                       <><Play className="w-3.5 h-3.5" /> Start</>
                     )}
@@ -951,7 +955,7 @@ const ChallengePage = () => {
                     onClick={startTimer}
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    Restart
+                    {t('challenge.restart.btn')}
                   </Button>
                 </div>
 
@@ -960,7 +964,7 @@ const ChallengePage = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Music2 className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold text-foreground">Countdown music</span>
+                      <span className="text-sm font-semibold text-foreground">{t('challenge.music.title')}</span>
                     </div>
                     <button
                       role="switch"
@@ -1003,12 +1007,12 @@ const ChallengePage = () => {
                     <p className="text-xs text-primary mt-2.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block flex-shrink-0" />
                       {timerActive
-                        ? `${musicVibe} · playing while timer runs`
-                        : `${musicVibe} · will play when timer starts`}
+                        ? `${musicVibe} · ${t('challenge.music.playing')}`
+                        : `${musicVibe} · ${t('challenge.music.waiting')}`}
                     </p>
                   )}
                   {!musicOn && (
-                    <p className="text-xs text-muted-foreground mt-2.5">Add rhythm to your countdown</p>
+                    <p className="text-xs text-muted-foreground mt-2.5">{t('challenge.music.sub')}</p>
                   )}
                 </div>
 
@@ -1019,7 +1023,7 @@ const ChallengePage = () => {
                     onClick={skipChallenge}
                   >
                     <SkipForward className="w-3.5 h-3.5" />
-                    Skip
+                    {t('challenge.skip.btn')}
                   </button>
                   <Button
                     className="flex-[2] h-14 text-base font-bold gap-2 rounded-2xl"
@@ -1027,7 +1031,7 @@ const ChallengePage = () => {
                     onClick={completeChallenge}
                   >
                     <Check className="w-5 h-5" />
-                    Done!
+                    {t('challenge.done.btn')}
                   </Button>
                 </div>
               </CardContent>
@@ -1052,8 +1056,8 @@ const ChallengePage = () => {
                   className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm bg-primary/10 text-primary border border-primary/25 hover:bg-primary/15 hover:border-primary/40 active:scale-95 transition-all duration-150 mt-1"
                 >
                   <Camera className="w-4 h-4" />
-                  Upload progress photo
-                  <span className="ml-1 text-xs font-normal text-primary/60">· earn bonus pts</span>
+                  {t('challenge.progress.btn')}
+                  <span className="ml-1 text-xs font-normal text-primary/60">{t('challenge.progress.earn')}</span>
                 </button>
               )
             ) : (
