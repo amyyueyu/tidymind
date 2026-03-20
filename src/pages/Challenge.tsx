@@ -675,10 +675,16 @@ const ChallengePage = () => {
     );
   }
 
+  // Circular ring progress values
+  const totalSecs = currentChallenge ? currentChallenge.time_estimate_minutes * 60 : 1;
+  const progressRatio = totalSecs > 0 ? Math.max(0, timeRemaining / totalSecs) : 0;
+  const strokeOffset = CIRCUMFERENCE * (1 - progressRatio);
+  const isEnding = timeRemaining > 0 && timeRemaining <= 30;
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#f5f4f0] flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+      <header className="sticky top-0 z-10 bg-[#f5f4f0]/90 backdrop-blur-sm border-b border-border">
         <div className="container max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center gap-3 mb-3">
             <Button variant="ghost" size="icon" onClick={() => navigate(isGuest ? "/auth" : "/")}>
@@ -712,14 +718,13 @@ const ChallengePage = () => {
 
       {/* Main Content */}
       <main className="flex-1 container max-w-2xl mx-auto px-4 py-6 flex flex-col">
-        {/* Vision Toggle — before_image_url is lazily loaded on demand */}
+        {/* Vision Toggle */}
         {room.after_image_url && (
           <Button
             variant="outline"
             className="mb-4 gap-2 animate-fade-in"
             onClick={async () => {
               if (!showVision && !room.before_image_url && roomId) {
-                // Lazy-load the (potentially large) before image only when needed
                 const { data } = await supabase
                   .from("rooms")
                   .select("before_image_url")
@@ -761,7 +766,7 @@ const ChallengePage = () => {
                     className={cn(
                       "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
                       index === currentChallengeIndex && challenge.status !== "completed"
-                        ? "bg-primary/10 border border-primary/20"
+                        ? "bg-primary/5 border-l-2 border-primary"
                         : "hover:bg-muted/50",
                       challenge.status === "completed" && "opacity-60 cursor-not-allowed"
                     )}
@@ -770,8 +775,12 @@ const ChallengePage = () => {
                     <div className="flex-1 min-w-0">
                       <p
                         className={cn(
-                          "text-sm font-medium truncate",
-                          challenge.status === "completed" && "line-through"
+                          "text-sm truncate",
+                          challenge.status === "completed"
+                            ? "line-through text-muted-foreground/50"
+                            : index === currentChallengeIndex
+                            ? "font-bold text-primary"
+                            : "font-medium"
                         )}
                       >
                         {challenge.title}
@@ -781,9 +790,9 @@ const ChallengePage = () => {
                       </p>
                     </div>
                     {index === currentChallengeIndex && challenge.status !== "completed" && (
-                      <Badge variant="secondary" className="shrink-0 text-xs">
-                        Active
-                      </Badge>
+                      <span className="shrink-0 text-xs font-semibold text-primary">
+                        current
+                      </span>
                     )}
                   </button>
                 ))}
@@ -792,45 +801,73 @@ const ChallengePage = () => {
           </CardContent>
         </Card>
 
-        {/* Selected Challenge Details + Timer */}
+        {/* Active Challenge Card */}
         {currentChallenge && currentChallenge.status !== "completed" && (
           <>
-            <Card className="border-0 shadow-lg mb-4 animate-scale-in">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold mb-2">{currentChallenge.title}</h2>
-                    {currentChallenge.description && (
-                      <p className="text-sm text-muted-foreground">{currentChallenge.description}</p>
-                    )}
+            <Card className="border-0 shadow-sm overflow-hidden rounded-3xl mb-4 animate-scale-in">
+              {/* Green header */}
+              <div className="bg-primary px-5 py-5 relative overflow-hidden">
+                <div className="absolute -top-12 -right-8 w-36 h-36 rounded-full bg-white/[0.06] pointer-events-none" />
+                <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1.5">
+                  Now doing
+                </p>
+                <h2 className="font-black text-white text-xl leading-tight mb-2">
+                  {currentChallenge.title}
+                </h2>
+                {currentChallenge.description && (
+                  <p className="text-sm text-white/75 leading-relaxed">
+                    {currentChallenge.description}
+                  </p>
+                )}
+              </div>
+
+              <CardContent className="px-5 pt-6 pb-5">
+                {/* Circular ring timer */}
+                <div className="flex justify-center my-2">
+                  <div className="relative w-40 h-40">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 160 160">
+                      {/* Track */}
+                      <circle
+                        cx="80" cy="80" r="70"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        className="text-muted/20"
+                      />
+                      {/* Progress */}
+                      <circle
+                        cx="80" cy="80" r="70"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        strokeLinecap="round"
+                        strokeDasharray={CIRCUMFERENCE}
+                        strokeDashoffset={strokeOffset}
+                        className={isEnding ? "text-amber-400" : "text-primary"}
+                        style={{ transition: "stroke-dashoffset 1s linear" }}
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className={cn(
+                        "font-black text-4xl leading-none tracking-tight",
+                        isEnding ? "text-amber-500" : "text-foreground"
+                      )}>
+                        {formatTime(timeRemaining)}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-1 font-medium">
+                        remaining
+                      </span>
+                    </div>
                   </div>
-                  {!isGuest && (
-                    <Badge variant="secondary" className="shrink-0">
-                      <Star className="w-3 h-3 mr-1" />
-                      {currentChallenge.points} pts
-                    </Badge>
-                  )}
                 </div>
 
-                {/* Timer */}
-                <div className="text-center pt-4 border-t border-border">
-                  <div
-                    className={cn(
-                      "text-5xl font-bold mb-3",
-                      timerActive ? "text-primary" : "text-muted-foreground"
-                    )}
-                  >
-                    {formatTime(timeRemaining)}
-                  </div>
-                {/* Music section — inside timer card */}
-                <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-4 text-left">
-                  {/* Header row */}
+                {/* Music section */}
+                <div className="rounded-2xl bg-muted/50 border border-border/50 p-4 mb-5 text-left">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Music2 className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-semibold text-foreground">Countdown music</span>
                     </div>
-                    {/* Custom pill toggle — Bug 1 fix */}
                     <button
                       role="switch"
                       aria-checked={musicOn}
@@ -848,8 +885,6 @@ const ChallengePage = () => {
                       />
                     </button>
                   </div>
-
-                  {/* Vibe pills — always visible so user can preview before starting */}
                   <div className="flex flex-wrap gap-1.5">
                     {Object.keys(MUSIC_PLAYLISTS).map((vibe) => (
                       <button
@@ -870,8 +905,6 @@ const ChallengePage = () => {
                       </button>
                     ))}
                   </div>
-
-                  {/* Status line */}
                   {musicOn && (
                     <p className="text-xs text-primary mt-2.5 flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse inline-block flex-shrink-0" />
@@ -885,122 +918,123 @@ const ChallengePage = () => {
                   )}
                 </div>
 
-                <div className="flex justify-center gap-3">
-                    {!timerStarted ? (
-                      <Button type="button" onClick={startTimer} size="lg" className="gap-2">
-                        <Play className="w-5 h-5" />
-                        Start Timer
-                      </Button>
-                    ) : timerActive ? (
+                {/* Encouragement pill */}
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/[0.08] border border-primary/15 mb-5">
+                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="text-xs font-medium text-primary/80 leading-snug">
+                    Focus on this one thing. You've got this! 💪
+                  </span>
+                </div>
+
+                {/* Level 1 — Done (primary, full-width, most prominent) */}
+                <Button
+                  className="w-full h-14 text-base font-bold gap-2 rounded-2xl"
+                  style={{ boxShadow: "0 4px 20px rgba(13,156,107,0.25)" }}
+                  onClick={completeChallenge}
+                >
+                  <Check className="w-5 h-5" />
+                  Done!
+                </Button>
+
+                {/* Level 2 — Pause / Continue + Restart (side by side) */}
+                <div className="grid grid-cols-2 gap-2 mt-2.5">
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "h-11 gap-2 rounded-xl font-semibold text-sm",
+                      timerActive
+                        ? "border-primary/40 text-primary bg-primary/5"
+                        : "border-border text-foreground"
+                    )}
+                    onClick={timerActive ? pauseTimer : (timerStarted ? resumeTimer : startTimer)}
+                  >
+                    {timerActive ? (
+                      <><Pause className="w-3.5 h-3.5" /> Pause</>
+                    ) : timerStarted ? (
+                      <><Play className="w-3.5 h-3.5" /> Continue</>
+                    ) : (
+                      <><Play className="w-3.5 h-3.5" /> Start</>
+                    )}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="h-11 gap-2 rounded-xl font-semibold text-sm border-border text-muted-foreground"
+                    onClick={startTimer}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    Restart
+                  </Button>
+                </div>
+
+                {/* Level 3 — Skip (text-only, understated) */}
+                <button
+                  className="w-full h-10 flex items-center justify-center gap-1.5 text-sm text-muted-foreground/50 mt-1 hover:text-muted-foreground transition-colors"
+                  onClick={skipChallenge}
+                >
+                  <SkipForward className="w-3.5 h-3.5" />
+                  Skip this task
+                </button>
+
+                {/* Progress photo — dashed tertiary */}
+                {!praiseData ? (
+                  showProgressUpload ? (
+                    <div className="mt-3">
+                      <ProgressPhotoUpload
+                        roomId={roomId!}
+                        roomName={room.name}
+                        intent={room.intent}
+                        beforeImageUrl={room.before_image_url ?? ""}
+                        completedChallenges={completedCount}
+                        totalChallenges={challenges.length}
+                        isGuest={isGuest}
+                        onPraiseReceived={handlePraiseReceived}
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      className="w-full h-11 flex items-center justify-center gap-2 text-sm text-muted-foreground/60 border border-dashed border-border/60 rounded-xl mt-3 hover:border-primary/40 hover:text-primary/60 transition-colors"
+                      onClick={() => setShowProgressUpload(true)}
+                    >
+                      <Camera className="w-4 h-4" />
+                      Show my progress
+                    </button>
+                  )
+                ) : (
+                  <div className="space-y-3 mt-3">
+                    <PraiseCard
+                      praise={praiseData.praise}
+                      bonusPoints={praiseData.bonusPoints}
+                      progressLabel={praiseData.progressLabel}
+                      isVisible={true}
+                    />
+                    {!showShareCard ? (
                       <Button
-                        type="button"
-                        onClick={pauseTimer}
                         variant="outline"
-                        size="lg"
-                        className="gap-2"
+                        size="sm"
+                        className="w-full gap-2"
+                        onClick={handleShowShareCard}
                       >
-                        <Pause className="w-5 h-5" />
-                        Pause
+                        <Share2 className="w-4 h-4" />
+                        Create shareable card
                       </Button>
                     ) : (
-                      <>
-                        <Button type="button" onClick={resumeTimer} size="lg" className="gap-2">
-                          <Play className="w-5 h-5" />
-                          Continue
-                        </Button>
-                        <Button type="button" onClick={startTimer} variant="outline" size="lg" className="gap-2">
-                          <SkipForward className="w-5 h-5" />
-                          Restart
-                        </Button>
-                      </>
+                      <ShareCard
+                        beforeImageUrl={room.before_image_url ?? ""}
+                        wipImageUrl={praiseData.wipImageUrl}
+                        shareTagline={praiseData.shareTagline}
+                        shareReactionPill={praiseData.shareReactionPill}
+                        shareSub={praiseData.shareSub}
+                        sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
+                        roomName={room.name}
+                        roomId={roomId}
+                      />
                     )}
                   </div>
-
-                {/* Skip / Done — inside the task card */}
-                <div className="flex gap-3 mt-4">
-                  <Button variant="outline" className="flex-1 h-12" onClick={skipChallenge}>
-                    <SkipForward className="w-4 h-4 mr-2" />
-                    Skip
-                  </Button>
-                  <Button className="flex-[2] h-12 text-base" onClick={completeChallenge}>
-                    <Check className="w-4 h-4 mr-2" />
-                    Done!
-                  </Button>
-                </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 
-            {/* Encouragement */}
-            <Card className="border-0 shadow-sm bg-accent/20 mb-4 animate-fade-in">
-              <CardContent className="p-4 flex items-center gap-3">
-                <Sparkles className="w-5 h-5 text-accent-foreground shrink-0" />
-                <p className="text-sm text-accent-foreground">
-                  Focus on this one thing. You've got this! 💪
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Progress Photo — mid session */}
-            <div className="mb-4 animate-fade-in">
-              {!praiseData ? (
-                showProgressUpload ? (
-                  <ProgressPhotoUpload
-                    roomId={roomId!}
-                    roomName={room.name}
-                    intent={room.intent}
-                    beforeImageUrl={room.before_image_url ?? ""}
-                    completedChallenges={completedCount}
-                    totalChallenges={challenges.length}
-                    isGuest={isGuest}
-                    onPraiseReceived={handlePraiseReceived}
-                  />
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full text-muted-foreground gap-2 border border-dashed border-border hover:border-primary/40 hover:text-foreground"
-                    onClick={() => setShowProgressUpload(true)}
-                  >
-                    <Camera className="w-4 h-4" />
-                    Show my progress
-                  </Button>
-                )
-              ) : (
-                <div className="space-y-3">
-                  <PraiseCard
-                    praise={praiseData.praise}
-                    bonusPoints={praiseData.bonusPoints}
-                    progressLabel={praiseData.progressLabel}
-                    isVisible={true}
-                  />
-                  {!showShareCard ? (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full gap-2"
-                      onClick={handleShowShareCard}
-                    >
-                      <Share2 className="w-4 h-4" />
-                      Create shareable card
-                    </Button>
-                  ) : (
-                    <ShareCard
-                      beforeImageUrl={room.before_image_url ?? ""}
-                      wipImageUrl={praiseData.wipImageUrl}
-                      shareTagline={praiseData.shareTagline}
-                      shareReactionPill={praiseData.shareReactionPill}
-                      shareSub={praiseData.shareSub}
-                      sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
-                      roomName={room.name}
-                      roomId={roomId}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Hidden YouTube BGM iframe — mounted only when music on AND timer active (Bug 3 fix) */}
+            {/* Hidden YouTube BGM iframe */}
             {musicOn && timerActive && (
               <iframe
                 key={`music-${musicVibe}-${musicKey}`}
