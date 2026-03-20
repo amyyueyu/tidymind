@@ -994,14 +994,6 @@ const ChallengePage = () => {
                   )}
                 </div>
 
-                {/* Encouragement pill */}
-                <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/[0.08] border border-primary/15 mb-5">
-                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="text-xs font-medium text-primary/80 leading-snug">
-                    Focus on this one thing. You've got this! 💪
-                  </span>
-                </div>
-
                 {/* Done + Skip row */}
                 <div className="flex gap-2">
                   <button
