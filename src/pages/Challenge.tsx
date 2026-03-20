@@ -955,7 +955,7 @@ const ChallengePage = () => {
                     onClick={startTimer}
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    Restart
+                    {t('challenge.restart.btn')}
                   </Button>
                 </div>
 
