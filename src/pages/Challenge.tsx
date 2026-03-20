@@ -912,6 +912,18 @@ const ChallengePage = () => {
                       </>
                     )}
                   </div>
+
+                {/* Skip / Done — inside the task card */}
+                <div className="flex gap-3 mt-4">
+                  <Button variant="outline" className="flex-1 h-12" onClick={skipChallenge}>
+                    <SkipForward className="w-4 h-4 mr-2" />
+                    Skip
+                  </Button>
+                  <Button className="flex-[2] h-12 text-base" onClick={completeChallenge}>
+                    <Check className="w-4 h-4 mr-2" />
+                    Done!
+                  </Button>
+                </div>
                 </div>
               </CardContent>
             </Card>
@@ -983,18 +995,6 @@ const ChallengePage = () => {
                   )}
                 </div>
               )}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 animate-fade-in">
-              <Button variant="outline" className="flex-1 h-14" onClick={skipChallenge}>
-                <SkipForward className="w-5 h-5 mr-2" />
-                Skip
-              </Button>
-              <Button className="flex-[2] h-14 text-base" onClick={completeChallenge}>
-                <Check className="w-5 h-5 mr-2" />
-                Done!
-              </Button>
             </div>
 
             {/* Hidden YouTube BGM iframe — mounted only when music on AND timer active (Bug 3 fix) */}
