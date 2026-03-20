@@ -251,6 +251,61 @@ const Index = () => {
           </CardContent>
         </Card>
       </main>
+
+      {/* First-session onboarding overlay */}
+      {showOnboarding && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-foreground/40 backdrop-blur-sm"
+            onClick={() => handleOnboardingDismiss(false)}
+          />
+
+          {/* Panel */}
+          <div className="relative z-10 w-full max-w-sm mx-4 mb-6 sm:mb-0 bg-card rounded-3xl shadow-2xl p-8 animate-fade-in overflow-hidden">
+            {/* Floating leaf decoration */}
+            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/10 flex items-end justify-start pl-6 pb-4">
+              <Leaf className="w-8 h-8 text-primary opacity-60" />
+            </div>
+
+            {/* Icon */}
+            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
+              <Camera className="w-8 h-8 text-primary-foreground" />
+            </div>
+
+            {/* Headline */}
+            <h2 className="text-2xl font-bold text-foreground leading-snug mb-3">
+              Let's start with<br />one room.
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+              Take a photo and AI will break it into small, doable tasks. No overwhelm. Just one thing at a time.
+            </p>
+
+            {/* Social proof micro-copy */}
+            <p className="text-xs text-muted-foreground mb-6 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-primary" />
+              Takes 30 seconds to get your first challenge
+            </p>
+
+            {/* Primary CTA */}
+            <button
+              onClick={() => handleOnboardingDismiss(true)}
+              className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-semibold py-3.5 text-base hover:bg-primary/90 transition-colors mb-3"
+            >
+              <Camera className="w-5 h-5" />
+              Take a photo now
+            </button>
+
+            {/* Skip link */}
+            <button
+              onClick={() => handleOnboardingDismiss(false)}
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+            >
+              I'll explore first
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
