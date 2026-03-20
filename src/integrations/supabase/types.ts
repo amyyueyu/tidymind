@@ -353,8 +353,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      add_progress_photo_points: {
-        Args: { p_points: number; p_room_id: string }
+      add_progress_photo_points:
+        | { Args: { p_room_id: string }; Returns: undefined }
+        | { Args: { p_points: number; p_room_id: string }; Returns: undefined }
+      check_and_award_badges: {
+        Args: { p_user_id: string }
         Returns: undefined
       }
       check_and_increment_rate_limit: {
