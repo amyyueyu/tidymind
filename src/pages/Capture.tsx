@@ -26,6 +26,7 @@ type Intent = "tidy" | "declutter" | "redesign";
 const Capture = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLang();
   const { isGuest: isGuestRaw, setGuestSession, sessionUsed, markSessionUsed, clearGuestSession } = useGuestMode();
   // If the user is authenticated, never treat them as a guest (clears stale sessionStorage)
   const isGuest = isGuestRaw && !user;

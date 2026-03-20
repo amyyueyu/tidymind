@@ -124,6 +124,7 @@ const ChallengePage = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLang();
   const { addPoints } = useProfile();
   const { popChallenge, showerComplete, starBurst } = useConfetti();
   const {
