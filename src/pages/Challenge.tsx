@@ -485,6 +485,7 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
     setTimerStarted(false);
+    releaseWakeLock();
 
     if (isGuest) {
       updateGuestChallenge(currentChallenge.id, { status: "skipped" });
