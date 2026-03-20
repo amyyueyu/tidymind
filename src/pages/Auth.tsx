@@ -116,10 +116,7 @@ const Auth = () => {
           ))}
         </div>
 
-        {/* Social proof label */}
-        <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase mb-3">
-          Real results from real messy rooms
-        </p>
+
 
         {/* Single before/after photo */}
         <div className="relative rounded-2xl overflow-hidden mb-2 shadow-sm">
