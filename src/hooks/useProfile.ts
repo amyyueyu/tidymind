@@ -67,6 +67,8 @@
   const addPoints = async (_points: number, challengeId: string) => {
     if (!user) return;
 
+    const prevLevel = profile?.current_level ?? 1;
+
     const { error } = await supabase.rpc("complete_challenge_add_points", {
       p_challenge_id: challengeId,
     });
@@ -90,6 +92,13 @@
         last_activity_date: data.last_activity_date,
       });
       setProfile(data);
+
+      // Fire level-up event if the level increased
+      if (data.current_level > prevLevel) {
+        window.dispatchEvent(new CustomEvent('tidymate:levelup', {
+          detail: { newLevel: data.current_level, prevLevel }
+        }));
+      }
     }
   };
  
