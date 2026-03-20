@@ -34,6 +34,8 @@ import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
 import PraiseCard from "@/components/PraiseCard";
 import ShareCard from "@/components/ShareCard";
+import LevelUpShareCard from "@/components/LevelUpShareCard";
+import { getBadgeForLevel, LEVEL_BADGES } from "@/lib/levelBadges";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
