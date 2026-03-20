@@ -964,7 +964,7 @@ const ChallengePage = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <Music2 className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-semibold text-foreground">Countdown music</span>
+                      <span className="text-sm font-semibold text-foreground">{t('challenge.music.title')}</span>
                     </div>
                     <button
                       role="switch"
