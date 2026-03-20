@@ -992,11 +992,12 @@ const ChallengePage = () => {
                     </div>
                   ) : (
                     <button
-                      className="w-full h-11 flex items-center justify-center gap-2 text-sm text-muted-foreground/60 border border-dashed border-border/60 rounded-xl mt-3 hover:border-primary/40 hover:text-primary/60 transition-colors"
                       onClick={() => setShowProgressUpload(true)}
+                      className="w-full h-12 flex items-center justify-center gap-2 rounded-2xl font-semibold text-sm bg-primary/10 text-primary border border-primary/25 hover:bg-primary/15 hover:border-primary/40 active:scale-95 transition-all duration-150 mt-3"
                     >
                       <Camera className="w-4 h-4" />
-                      Show my progress
+                      Upload progress photo
+                      <span className="ml-1 text-xs font-normal text-primary/60">· earn bonus pts</span>
                     </button>
                   )
                 ) : (
