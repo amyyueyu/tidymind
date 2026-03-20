@@ -768,9 +768,10 @@ const ChallengePage = () => {
                 Save progress
               </Badge>
             ) : (
-              <Badge variant="secondary" className="shrink-0">
+              <Badge variant="secondary" className="shrink-0 flex items-center gap-1">
                 <Star className="w-3 h-3 mr-1" />
                 {currentChallenge?.points} pts
+                <span className="ml-1"><LangToggle /></span>
               </Badge>
             )}
           </div>
