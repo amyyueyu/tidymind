@@ -543,7 +543,7 @@ const Capture = () => {
               onClick={proceedToChallenges}
             >
               <Sparkles className="w-5 h-5 mr-2" />
-              {generatingVision ? "Start While Vision Loads" : "Start My Challenges"}
+              {generatingVision ? t('capture.start.loading') : t('capture.start.btn')}
             </Button>
           </div>
         )}
