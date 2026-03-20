@@ -380,6 +380,7 @@ const ChallengePage = () => {
     stopInterval();
     setTimerActive(false);
     setTimerStarted(false);
+    releaseWakeLock();
 
     // Calculate actual time spent
     const actualSecs = challengeStartTime
