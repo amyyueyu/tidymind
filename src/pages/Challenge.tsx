@@ -76,11 +76,11 @@ function playEarlyFinishSound() {
 
 // ─── YouTube BGM vibes ──────────────────────────────────────────────────────────
 const MUSIC_PLAYLISTS: Record<string, string> = {
-  "lofi focus":  "jfKfPfyJRdk",
-  "chill waves": "Na0w3Mz46GA",
-  "upbeat":      "DWcJFNfaw9c",
-  "night calm":  "5qap5aO4i9A",
-  "indie pop":   "NIYcGrJpBPc",
+  "lofi focus":  "jfKfPfyJRdk",  // Lofi Girl — live stream, embeddable ✓
+  "chill waves": "Na0w3Mz46GA",  // Lofi Girl — live stream, embeddable ✓
+  "upbeat":      "7NOSDKb0HlU",  // Chillhop Music — embeddable ✓
+  "night calm":  "4xDzrJKXOOY",  // Lofi Girl — embeddable ✓
+  "indie pop":   "n61ULEU7CO0",  // Lofi Girl — embeddable ✓
 };
 
 const VIBE_LABELS: Record<string, string> = {
