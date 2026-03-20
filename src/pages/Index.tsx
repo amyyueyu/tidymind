@@ -38,6 +38,7 @@ const Index = () => {
   const { user, loading: authLoading, signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
   const navigate = useNavigate();
+  const { t } = useLang();
   const [activeRooms, setActiveRooms] = useState<any[]>([]);
   const [roomsLoaded, setRoomsLoaded] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -87,8 +88,8 @@ const Index = () => {
         `tidymate_onboarded_${user?.id}`
       );
       if (!hasSeenOnboarding && profile.total_points === 0) {
-        const t = setTimeout(() => setShowOnboarding(true), 400);
-        return () => clearTimeout(t);
+        const timer = setTimeout(() => setShowOnboarding(true), 400);
+        return () => clearTimeout(timer);
       }
     }
   }, [profile, profileLoading, authLoading, activeRooms, roomsLoaded, user]);
@@ -119,13 +120,6 @@ const Index = () => {
   const displayName = profile.display_name || "friend";
   const badge = getBadgeForLevel(profile.current_level);
 
-  const streakMessage =
-    profile.current_streak === 0
-      ? "Every journey starts somewhere. Today's a good day."
-      : profile.current_streak <= 3
-      ? "You're building something real."
-      : "Look at you showing up consistently. 🔥";
-
   return (
     <div className="min-h-screen bg-[#f5f4f0]">
       {/* ── Hero Header ─────────────────────────────────────────────── */}
@@ -139,19 +133,22 @@ const Index = () => {
             <Leaf className="w-5 h-5 text-white" />
             <span className="font-bold text-white text-lg">TidyMate</span>
           </div>
-          <button
-            onClick={signOut}
-            className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center"
-          >
-            <LogOut className="w-4 h-4 text-white/80" />
-          </button>
+          <div className="flex items-center gap-2">
+            <LangToggle />
+            <button
+              onClick={signOut}
+              className="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center"
+            >
+              <LogOut className="w-4 h-4 text-white/80" />
+            </button>
+          </div>
         </div>
 
         {/* Greeting */}
         <h1 className="font-black text-white text-3xl leading-tight mb-1 relative z-10">
           Hey, {displayName}! 👋
         </h1>
-        <p className="text-white/70 text-sm relative z-10">{greeting}</p>
+        <p className="text-white/70 text-sm relative z-10">{t('dash.greeting.sub')}</p>
       </div>
 
       {/* ── Floating Stat Cards ──────────────────────────────────────── */}
@@ -159,12 +156,12 @@ const Index = () => {
         <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
           <span className="text-xl block mb-0.5">🔥</span>
           <p className="font-black text-xl text-amber-500 leading-none">{profile.current_streak}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">Day streak</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{t('dash.streak')}</p>
         </div>
         <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
           <span className="text-xl block mb-0.5">⭐</span>
           <p className="font-black text-xl text-violet-600 leading-none">{profile.total_points}</p>
-          <p className="text-[10px] text-gray-400 mt-0.5">Points</p>
+          <p className="text-[10px] text-gray-400 mt-0.5">{t('dash.points')}</p>
         </div>
         <div className="bg-white rounded-2xl p-3 text-center" style={{ boxShadow: "0 4px 16px rgba(0,0,0,0.08)" }}>
           <span className="text-xl block mb-0.5">🏆</span>
@@ -183,7 +180,7 @@ const Index = () => {
               {badge.title} · Level {profile.current_level}
             </span>
             <span className="text-[11px] text-gray-400">
-              {pointsToNextLevel} pts to Lv.{profile.current_level + 1}
+              {pointsToNextLevel} {t('dash.pts.next')} {profile.current_level + 1}
             </span>
           </div>
           <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
@@ -206,10 +203,10 @@ const Index = () => {
           </div>
           <div className="flex-1 relative z-10">
             <p className="font-extrabold text-white text-base leading-tight">
-              Capture a new space
+              {t('dash.capture.title')}
             </p>
             <p className="text-white/70 text-xs mt-0.5">
-              AI turns chaos into a plan in 30s
+              {t('dash.capture.sub')}
             </p>
           </div>
           <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center relative z-10">
@@ -221,9 +218,9 @@ const Index = () => {
         {activeRooms.length > 0 && (
           <>
             <div className="flex justify-between items-center mb-3">
-              <h2 className="font-black text-base text-gray-900">Active challenges</h2>
+              <h2 className="font-black text-base text-gray-900">{t('dash.active.title')}</h2>
               <span className="text-xs font-semibold bg-gray-900 text-white px-2.5 py-1 rounded-full">
-                {activeRooms.length} rooms
+                {activeRooms.length} {t('dash.rooms')}
               </span>
             </div>
 
@@ -253,8 +250,7 @@ const Index = () => {
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-sm text-gray-900 truncate">{room.name}</p>
                     <p className="text-[11px] text-gray-400 mt-0.5">
-                      {room.completed_challenges} of {room.total_challenges} done
-                      {room.completed_challenges === 0 ? " · not started" : " · keep going"}
+                      {room.completed_challenges} of {room.total_challenges} {t('dash.challenges.done')}
                     </p>
                   </div>
 
@@ -292,27 +288,27 @@ const Index = () => {
               <Camera className="w-8 h-8 text-primary-foreground" />
             </div>
             <h2 className="text-2xl font-bold text-foreground leading-snug mb-3">
-              Let's start with<br />one room.
+              {t('onboard.title')}
             </h2>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              Take a photo and AI will break it into small, doable tasks. No overwhelm. Just one thing at a time.
+              {t('onboard.sub')}
             </p>
             <p className="text-xs text-muted-foreground mb-6 flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-primary" />
-              Takes 30 seconds to get your first challenge
+              {t('onboard.micro')}
             </p>
             <button
               onClick={() => handleOnboardingDismiss(true)}
               className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary text-primary-foreground font-semibold py-3.5 text-base hover:bg-primary/90 transition-colors mb-3"
             >
               <Camera className="w-5 h-5" />
-              Take a photo now
+              {t('onboard.cta')}
             </button>
             <button
               onClick={() => handleOnboardingDismiss(false)}
               className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
             >
-              I'll explore first
+              {t('onboard.skip')}
             </button>
           </div>
         </div>
