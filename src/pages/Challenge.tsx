@@ -74,12 +74,16 @@ function playEarlyFinishSound() {
   setTimeout(() => playTone("sine", 784, 0.2), 160); // G5
 }
 
-// ─── YouTube BGM playlists ──────────────────────────────────────────────────────
-const MUSIC_PLAYLISTS: Record<string, string> = {
-  focus:  "jfKfPfyJRdk", // lofi hip hop — beats to relax/study
-  calm:   "5qap5aO4i9A", // lofi hip hop — beats to sleep/chill
-  energy: "DWcJFNfaw9c", // lofi hip hop — beats to work/game
-};
+// ─── YouTube BGM vibes ──────────────────────────────────────────────────────────
+const MUSIC_VIBES = [
+  { id: "lofi-focus",  label: "lofi focus",  emoji: "🎵", youtubeId: "jfKfPfyJRdk" },
+  { id: "chill-waves", label: "chill waves", emoji: "🌊", youtubeId: "5qap5aO4i9A" },
+  { id: "upbeat",      label: "upbeat",      emoji: "⚡", youtubeId: "DWcJFNfaw9c" },
+  { id: "night-calm",  label: "night calm",  emoji: "🌙", youtubeId: "4oStw0r33so" },
+  { id: "indie-pop",   label: "indie pop",   emoji: "🎸", youtubeId: "HTsL9PWPB6g" },
+] as const;
+
+type MusicVibeId = typeof MUSIC_VIBES[number]["id"];
 
 interface Challenge {
   id: string;
@@ -130,9 +134,7 @@ const ChallengePage = () => {
 
   // Music state
   const [musicOn, setMusicOn] = useState(false);
-  const [musicVibe, setMusicVibe] = useState<"focus" | "calm" | "energy">("focus");
-
-  const toggleMusic = () => setMusicOn((prev) => !prev);
+  const [musicVibe, setMusicVibe] = useState<MusicVibeId>("lofi-focus");
 
   // Progress photo & sharing state
   const [showProgressUpload, setShowProgressUpload] = useState(false);
@@ -759,7 +761,65 @@ const ChallengePage = () => {
                   >
                     {formatTime(timeRemaining)}
                   </div>
-                  <div className="flex justify-center gap-3">
+                {/* Music section — inside timer card */}
+                <div className="bg-muted/40 rounded-2xl p-3 mx-0 mb-4">
+                  {/* Header row: label + toggle */}
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                      <Music className="w-3.5 h-3.5" />
+                      Countdown music
+                    </div>
+                    <button
+                      onClick={() => setMusicOn((prev) => !prev)}
+                      className={cn(
+                        "relative w-10 h-5 rounded-full transition-colors",
+                        musicOn ? "bg-primary" : "bg-muted-foreground/30"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200",
+                          musicOn ? "translate-x-5" : "translate-x-0.5"
+                        )}
+                      />
+                    </button>
+                  </div>
+
+                  {musicOn && (
+                    <>
+                      <div className="flex gap-1.5 flex-wrap">
+                        {MUSIC_VIBES.map((vibe) => (
+                          <button
+                            key={vibe.id}
+                            onClick={() => setMusicVibe(vibe.id)}
+                            className={cn(
+                              "flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border-[1.5px] transition-colors",
+                              musicVibe === vibe.id
+                                ? "bg-primary text-primary-foreground border-primary"
+                                : "bg-background text-muted-foreground border-border"
+                            )}
+                          >
+                            <span>{vibe.emoji}</span>
+                            {vibe.label}
+                          </button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse flex-shrink-0" />
+                        <span className="text-[10px] text-primary font-semibold">
+                          {MUSIC_VIBES.find((v) => v.id === musicVibe)?.label}
+                          {" "}· playing while timer runs
+                        </span>
+                      </div>
+                    </>
+                  )}
+
+                  {!musicOn && (
+                    <p className="text-[11px] text-muted-foreground">Add rhythm to your countdown</p>
+                  )}
+                </div>
+
+                <div className="flex justify-center gap-3">
                     {!timerActive ? (
                       <Button type="button" onClick={startTimer} size="lg" className="gap-2">
                         <Play className="w-5 h-5" />
@@ -851,35 +911,6 @@ const ChallengePage = () => {
               )}
             </div>
 
-            {/* Music toggle */}
-            <div className="flex items-center justify-center gap-3 py-1 animate-fade-in">
-              <button
-                onClick={toggleMusic}
-                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Music className={cn("w-3.5 h-3.5", musicOn && "text-primary")} />
-                {musicOn ? "Music on" : "Add music"}
-              </button>
-              {musicOn && (
-                <div className="flex gap-1">
-                  {(["focus", "calm", "energy"] as const).map((vibe) => (
-                    <button
-                      key={vibe}
-                      onClick={() => setMusicVibe(vibe)}
-                      className={cn(
-                        "text-xs px-2 py-0.5 rounded-full border transition-colors",
-                        musicVibe === vibe
-                          ? "border-primary text-primary bg-primary/5"
-                          : "border-border text-muted-foreground"
-                      )}
-                    >
-                      {vibe}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Action Buttons */}
             <div className="flex gap-3 animate-fade-in">
               <Button variant="outline" className="flex-1 h-14" onClick={skipChallenge}>
@@ -896,7 +927,7 @@ const ChallengePage = () => {
             {musicOn && (
               <iframe
                 key={musicVibe}
-                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0`}
+                src={`https://www.youtube.com/embed/${MUSIC_VIBES.find((v) => v.id === musicVibe)?.youtubeId}?autoplay=1&mute=0`}
                 allow="autoplay"
                 style={{ display: "none" }}
                 title="background music"
