@@ -12,6 +12,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { getBadgeForLevel } from "@/lib/levelBadges";
+import { LangToggle } from "@/components/LangToggle";
+import { useLang } from "@/contexts/LanguageContext";
 
 const GREETINGS = [
   "No pressure. Even 10 minutes counts.",
