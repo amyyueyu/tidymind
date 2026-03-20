@@ -5,6 +5,7 @@ const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST ?? "https://us.i.posthog.
 
 export function initAnalytics() {
   if (typeof window === "undefined") return;
+  if (!POSTHOG_KEY) return; // Skip if key not configured
   posthog.init(POSTHOG_KEY, {
     api_host: POSTHOG_HOST,
     capture_pageview: true,
