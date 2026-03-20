@@ -1012,6 +1012,77 @@ const ChallengePage = () => {
           </>
         )}
       </main>
+
+      {/* ── Level-up modal ─────────────────────────────────────────────────── */}
+      {showLevelUpModal && levelUpData && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowLevelUpModal(false)}
+        >
+          <Card
+            className="max-w-sm w-full border-0 shadow-xl animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CardContent className="p-6 text-center space-y-4">
+              <div className="text-5xl">{levelUpData.badge.emoji}</div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                  Level {levelUpData.newLevel} unlocked
+                </p>
+                <h2 className="text-2xl font-bold">{levelUpData.badge.title}</h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {levelUpData.badge.subtitle}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setShowLevelUpModal(false)}
+                >
+                  Keep going
+                </Button>
+                <Button
+                  className="flex-1 gap-2"
+                  onClick={() => {
+                    setShowLevelUpModal(false);
+                    setShowLevelUpShareCard(true);
+                  }}
+                >
+                  <Share2 className="w-4 h-4" />
+                  Share
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ── Level-up share card overlay ────────────────────────────────────── */}
+      {showLevelUpShareCard && levelUpData && (
+        <div
+          className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setShowLevelUpShareCard(false)}
+        >
+          <div
+            className="w-full max-w-sm animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <p className="font-semibold text-foreground">Your badge card</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground"
+                onClick={() => setShowLevelUpShareCard(false)}
+              >
+                Close
+              </Button>
+            </div>
+            <LevelUpShareCard level={levelUpData.newLevel} badge={levelUpData.badge} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
