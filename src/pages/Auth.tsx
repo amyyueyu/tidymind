@@ -98,7 +98,7 @@ const Auth = () => {
         <div className="relative z-10 max-w-2xl w-full space-y-6">
           {/* Header */}
            <div className="text-center space-y-2">
-             <h2 className="text-2xl font-bold text-foreground">See the Transformations</h2>
+             <h2 className="text-2xl font-bold text-primary">See the Transformations</h2>
              
             </div>
           
