@@ -391,7 +391,7 @@ const Capture = () => {
 
         {/* Intent Selection */}
         <div className="space-y-3 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-          <h2 className="font-semibold">What would you like to do?</h2>
+          <h2 className="font-semibold">{t('capture.intent.label')}</h2>
           <RadioGroup value={intent} onValueChange={(v) => setIntent(v as Intent)}>
             <div className="grid gap-3">
               {intentOptions.map((option) => (
