@@ -1,78 +1,52 @@
 
+## The Bug
 
-# TidyMind - ADHD-Friendly Declutter Assistant
+`startTimer()` always resets `timeRemaining` back to `ch.time_estimate_minutes * 60` before starting the interval. So clicking "Start Timer" after a pause always restarts from the full duration instead of resuming.
 
-## Overview
-An AI-powered app that transforms tidying and decluttering from overwhelming chores into dopamine-boosting, achievable challenges. Users photograph their spaces, and AI breaks down the chaos into fun, timed micro-tasks while showing them an inspiring vision of the outcome.
+## The Fix
 
----
+**Introduce a `timerStarted` state** to distinguish three timer phases:
+- `timerStarted === false` → timer never begun → show **"Start Timer"** button
+- `timerStarted === true && timerActive === false` → timer was started but is now paused → show **"Continue"** + **"Restart"** buttons
+- `timerActive === true` → timer is counting → show **"Pause"** button
 
-## Core User Flow
+### State changes (line ~133)
+Add one new state:
+```ts
+const [timerStarted, setTimerStarted] = useState(false)
+```
+Reset it to `false` in `selectChallenge()` and when moving to next challenge after `completeChallenge()` / `skipChallenge()`.
 
-### 1. Onboarding & Sign Up
-- Simple account creation (email/password or Google sign-in)
-- Brief "What's your biggest challenge?" selector (tidying, decluttering, organizing)
-- Set notification preferences for gentle reminders
+### `startTimer` → split into two functions
 
-### 2. Capture Your Space
-- Camera interface to photograph a messy area
-- Select intent: "Tidy Up" / "Declutter" / "Redesign"
-- Optional: Add context ("I have 15 minutes" or "Weekend project")
+**`startTimer()`** (fresh start, used by "Start Timer" and "Restart"):
+- Keep existing logic (resets `timeRemaining` to full estimate, starts interval)
+- Also sets `setTimerStarted(true)`
 
-### 3. AI Analysis & Vision
-- AI analyzes the image to identify items and clutter patterns
-- Generates an inspiring "after" visualization of the transformed space
-- Side-by-side before/after view to spark motivation
+**`resumeTimer()`** (used by "Continue"):
+- Does **not** reset `timeRemaining` — picks up from current value
+- Starts the interval from the current `timeRemaining` value
+- Sets `setTimerActive(true)`
 
-### 4. Gamified Challenges
-- AI breaks the task into small, ADHD-friendly micro-challenges
-- Each challenge has:
-  - Clear, single-action instruction ("Clear the coffee table surface")
-  - Time estimate (5-10 min chunks)
-  - Optional timer for beat-the-clock mode
-  - Point value based on difficulty
-- Progress bar showing journey to completion
+### Button UI change (lines 835–853)
 
-### 5. Rewards & Progress
-- Points earned for each completed challenge
-- Daily streaks with gentle celebration
-- Level system unlocking achievement badges
-- Room transformation history gallery
+Replace the current two-state toggle with three states:
 
----
+```
+!timerStarted            → <Start Timer> button (full width)
+timerStarted && !timerActive → two buttons side-by-side:
+                              [▶ Continue]  [↺ Restart]
+timerActive              → <Pause> button
+```
 
-## Key Screens
+The "Continue" button calls `resumeTimer()`.  
+The "Restart" button calls `startTimer()` (resets to full time).
 
-| Screen | Purpose |
-|--------|---------|
-| **Home Dashboard** | Quick-start camera, streak counter, active challenges |
-| **Capture & Analyze** | Camera view with intent selector |
-| **Vision Board** | Before/after comparison with AI visualization |
-| **Challenge Mode** | Active task with timer, progress, encouragement |
-| **Progress Profile** | Points, level, badges, streak history, completed rooms |
+### What does NOT change
+- `pauseTimer()` — unchanged
+- `completeChallenge()`, `skipChallenge()` — only add `setTimerStarted(false)` alongside existing `setTimerActive(false)` calls
+- `selectChallenge()` — add `setTimerStarted(false)`
+- Timer interval logic, points, Supabase, music, sound effects — untouched
 
----
-
-## Design Philosophy
-- **Calm & minimal**: Soft, muted color palette with plenty of whitespace
-- **Low cognitive load**: One action per screen, clear visual hierarchy
-- **Encouraging tone**: Supportive microcopy ("You've got this!" not "You must...")
-- **Visual rewards**: Subtle animations for completions, not overwhelming
-
----
-
-## Technical Approach
-- **Backend**: Lovable Cloud for authentication, database (user profiles, challenges, progress)
-- **AI**: Lovable AI for image analysis and generating personalized challenges
-- **Image Generation**: AI-powered before/after visualization using the image generation model
-- **Mobile-optimized**: Responsive design that works great on phones for easy photo capture
-
----
-
-## MVP Scope Summary
-✅ User accounts with progress persistence  
-✅ Photo capture and AI room analysis  
-✅ Before/after transformation visualization  
-✅ Gamified micro-challenges with timers  
-✅ Points, levels, and streak tracking  
-
+## Files to edit
+- `src/pages/Challenge.tsx` only
