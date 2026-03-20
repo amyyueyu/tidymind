@@ -178,6 +178,26 @@ const ChallengePage = () => {
   const guestHydratedRoomIdRef = useRef<string | null>(null);
   const timeRemainingRef = useRef(0);
 
+  // Wake lock ref
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  const acquireWakeLock = async () => {
+    if ("wakeLock" in navigator) {
+      try {
+        wakeLockRef.current = await (navigator as any).wakeLock.request("screen");
+      } catch {
+        // Wake lock not available — fail silently
+      }
+    }
+  };
+
+  const releaseWakeLock = () => {
+    if (wakeLockRef.current) {
+      wakeLockRef.current.release();
+      wakeLockRef.current = null;
+    }
+  };
+
   // Keep refs in sync with state on every render
   challengesRef.current = challenges;
   challengeIndexRef.current = currentChallengeIndex;
