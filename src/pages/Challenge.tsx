@@ -425,6 +425,15 @@ const ChallengePage = () => {
 
   // Session complete screen
   if (!room || allDone || sessionComplete) {
+    // Compute fastest challenge that was finished early
+    const fastestChallenge = challenges
+      .filter((c) => c.status === "completed" && c.actual_seconds != null && c.actual_seconds > 0)
+      .sort((a, b) => (a.actual_seconds ?? 999999) - (b.actual_seconds ?? 999999))[0];
+    const fastestWasEarly =
+      fastestChallenge &&
+      fastestChallenge.actual_seconds != null &&
+      fastestChallenge.actual_seconds < fastestChallenge.time_estimate_minutes * 60 * 0.6;
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="text-center max-w-sm w-full space-y-6">
@@ -438,6 +447,16 @@ const ChallengePage = () => {
                 ? "You just completed a full declutter session. Imagine what you could do with streaks, points, and your progress saved."
                 : "You've completed all challenges for this space!"}
             </p>
+            {fastestWasEarly && fastestChallenge && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 rounded-lg p-3 mt-3 text-left">
+                <span className="text-lg">⚡</span>
+                <span>
+                  Fastest task: <strong>{fastestChallenge.title}</strong>
+                  {" "}in {fastestChallenge.actual_seconds}s
+                  {" "}(estimated {fastestChallenge.time_estimate_minutes} min)
+                </span>
+              </div>
+            )}
           </div>
 
           {isGuest ? (
@@ -522,6 +541,9 @@ const ChallengePage = () => {
                       sessionMinutes={Math.round((Date.now() - sessionStartTime) / 60000)}
                       roomName={room?.name ?? "My Space"}
                       roomId={roomId}
+                      fastestTaskSecs={fastestWasEarly && fastestChallenge?.actual_seconds ? fastestChallenge.actual_seconds : undefined}
+                      fastestTaskTitle={fastestWasEarly ? fastestChallenge?.title : undefined}
+                      estimatedTaskMins={fastestWasEarly ? fastestChallenge?.time_estimate_minutes : undefined}
                     />
                   )}
                 </div>
