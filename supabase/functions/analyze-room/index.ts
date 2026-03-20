@@ -25,18 +25,27 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // --- Auth detection ---
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    // --- Auth detection (use getUser, not getClaims which doesn't exist) ---
     const authHeader = req.headers.get("Authorization");
     let userId: string | null = null;
 
     if (authHeader?.startsWith("Bearer ")) {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: { headers: { Authorization: authHeader } },
-      });
       const token = authHeader.replace("Bearer ", "");
-      const { data, error } = await supabase.auth.getClaims(token);
-      if (!error && data?.claims?.sub) {
-        userId = data.claims.sub;
+      // Skip JWT decode for anon key (it's not a user token)
+      if (token !== SUPABASE_ANON_KEY) {
+        try {
+          const supabaseAuth = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            global: { headers: { Authorization: authHeader } },
+          });
+          const { data: { user }, error } = await supabaseAuth.auth.getUser(token);
+          if (!error && user?.id) {
+            userId = user.id;
+          }
+        } catch (authErr) {
+          console.warn("Auth check failed, treating as guest:", authErr);
+        }
       }
     }
 
@@ -51,7 +60,8 @@ serve(async (req) => {
       : `ip:${clientIp}:analyze-room`;
     const maxCalls = userId ? AUTHED_MAX : GUEST_MAX;
 
-    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Use service role key so RLS doesn't block the rate_limits table
+    const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY || SUPABASE_ANON_KEY);
     const { data: allowed, error: rlError } = await supabaseAdmin.rpc(
       "check_and_increment_rate_limit",
       {
