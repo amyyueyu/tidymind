@@ -187,6 +187,19 @@ const ChallengePage = () => {
     }
   }, [user, authLoading, isGuest, navigate]);
 
+  // Level-up event listener
+  useEffect(() => {
+    const handleLevelUp = (e: CustomEvent) => {
+      setLevelUpData({
+        newLevel: e.detail.newLevel,
+        badge: getBadgeForLevel(e.detail.newLevel),
+      });
+      setShowLevelUpModal(true);
+    };
+    window.addEventListener("tidymate:levelup", handleLevelUp as EventListener);
+    return () => window.removeEventListener("tidymate:levelup", handleLevelUp as EventListener);
+  }, []);
+
   // Load room data — guest branch only runs ONCE per roomId via ref gate
   useEffect(() => {
     if (isGuest && guestRoom && roomId === guestRoom.id) {
