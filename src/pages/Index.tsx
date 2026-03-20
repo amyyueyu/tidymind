@@ -72,6 +72,26 @@ const Index = () => {
     if (data) setActiveRooms(data);
   };
 
+  useEffect(() => {
+    if (!profileLoading && !authLoading && profile && !activeRooms.length) {
+      const hasSeenOnboarding = localStorage.getItem(
+        `tidymate_onboarded_${user?.id}`
+      );
+      if (!hasSeenOnboarding && profile.total_points === 0) {
+        const t = setTimeout(() => setShowOnboarding(true), 400);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [profile, profileLoading, authLoading, activeRooms, user]);
+
+  const handleOnboardingDismiss = (goToCapture: boolean) => {
+    localStorage.setItem(`tidymate_onboarded_${user?.id}`, "true");
+    setShowOnboarding(false);
+    if (goToCapture) {
+      navigate("/capture");
+    }
+  };
+
   if (authLoading || profileLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
