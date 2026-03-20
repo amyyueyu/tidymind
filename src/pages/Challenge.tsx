@@ -851,6 +851,35 @@ const ChallengePage = () => {
               )}
             </div>
 
+            {/* Music toggle */}
+            <div className="flex items-center justify-center gap-3 py-1 animate-fade-in">
+              <button
+                onClick={toggleMusic}
+                className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Music className={cn("w-3.5 h-3.5", musicOn && "text-primary")} />
+                {musicOn ? "Music on" : "Add music"}
+              </button>
+              {musicOn && (
+                <div className="flex gap-1">
+                  {(["focus", "calm", "energy"] as const).map((vibe) => (
+                    <button
+                      key={vibe}
+                      onClick={() => setMusicVibe(vibe)}
+                      className={cn(
+                        "text-xs px-2 py-0.5 rounded-full border transition-colors",
+                        musicVibe === vibe
+                          ? "border-primary text-primary bg-primary/5"
+                          : "border-border text-muted-foreground"
+                      )}
+                    >
+                      {vibe}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className="flex gap-3 animate-fade-in">
               <Button variant="outline" className="flex-1 h-14" onClick={skipChallenge}>
@@ -862,6 +891,17 @@ const ChallengePage = () => {
                 Done!
               </Button>
             </div>
+
+            {/* Hidden YouTube BGM iframe — only mounted after explicit user opt-in */}
+            {musicOn && (
+              <iframe
+                key={musicVibe}
+                src={`https://www.youtube.com/embed/${MUSIC_PLAYLISTS[musicVibe]}?autoplay=1&mute=0`}
+                allow="autoplay"
+                style={{ display: "none" }}
+                title="background music"
+              />
+            )}
           </>
         )}
       </main>
