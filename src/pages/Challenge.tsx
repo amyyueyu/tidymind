@@ -872,7 +872,7 @@ const ChallengePage = () => {
               <div className="bg-primary px-5 py-5 relative overflow-hidden">
                 <div className="absolute -top-12 -right-8 w-36 h-36 rounded-full bg-white/[0.06] pointer-events-none" />
                 <p className="text-xs font-semibold text-white/60 uppercase tracking-widest mb-1.5">
-                  Now doing
+                  {t('challenge.now.doing')}
                 </p>
                 <h2 className="font-black text-white text-xl leading-tight mb-2">
                   {currentChallenge.title}
