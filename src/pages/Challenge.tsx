@@ -859,12 +859,12 @@ const ChallengePage = () => {
                 </div>
 
                 <div className="flex justify-center gap-3">
-                    {!timerActive ? (
+                    {!timerStarted ? (
                       <Button type="button" onClick={startTimer} size="lg" className="gap-2">
                         <Play className="w-5 h-5" />
                         Start Timer
                       </Button>
-                    ) : (
+                    ) : timerActive ? (
                       <Button
                         type="button"
                         onClick={pauseTimer}
@@ -875,6 +875,17 @@ const ChallengePage = () => {
                         <Pause className="w-5 h-5" />
                         Pause
                       </Button>
+                    ) : (
+                      <>
+                        <Button type="button" onClick={resumeTimer} size="lg" className="gap-2">
+                          <Play className="w-5 h-5" />
+                          Continue
+                        </Button>
+                        <Button type="button" onClick={startTimer} variant="outline" size="lg" className="gap-2">
+                          <SkipForward className="w-5 h-5" />
+                          Restart
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
