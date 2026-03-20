@@ -28,6 +28,7 @@ import {
   Camera,
   Download,
   Share2,
+  Music,
 } from "lucide-react";
 import VisionComparison from "@/components/VisionComparison";
 import ProgressPhotoUpload from "@/components/ProgressPhotoUpload";
@@ -37,6 +38,48 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { analytics } from "@/lib/analytics";
 import { useConfetti } from "@/hooks/useConfetti";
+
+// ─── Audio helpers ─────────────────────────────────────────────────────────────
+function playTone(
+  type: OscillatorType,
+  frequency: number,
+  duration: number,
+  gain = 0.15
+) {
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = frequency;
+    gainNode.gain.setValueAtTime(gain, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch {
+    // Audio not available — fail silently
+  }
+}
+
+function playDoneSound() {
+  playTone("sine", 523, 0.15); // C5
+  setTimeout(() => playTone("sine", 659, 0.25), 120); // E5
+}
+
+function playEarlyFinishSound() {
+  playTone("sine", 523, 0.1);
+  setTimeout(() => playTone("sine", 659, 0.1), 80);
+  setTimeout(() => playTone("sine", 784, 0.2), 160); // G5
+}
+
+// ─── YouTube BGM playlists ──────────────────────────────────────────────────────
+const MUSIC_PLAYLISTS: Record<string, string> = {
+  focus:  "jfKfPfyJRdk", // lofi hip hop — beats to relax/study
+  calm:   "5qap5aO4i9A", // lofi hip hop — beats to sleep/chill
+  energy: "DWcJFNfaw9c", // lofi hip hop — beats to work/game
+};
 
 interface Challenge {
   id: string;
