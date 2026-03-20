@@ -252,6 +252,9 @@ const ShareCard = ({
   wipImageUrl,
   shareTagline,
   roomId,
+  fastestTaskSecs,
+  fastestTaskTitle,
+  estimatedTaskMins,
 }: ShareCardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [drawing, setDrawing] = useState(true);
