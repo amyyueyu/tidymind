@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/sonner";
 import { Sparkles, ArrowRight } from "lucide-react";
-import logoImg from "@/assets/logo.png";
+import { TiddyMascot } from "@/components/TiddyMascot";
 import { LangToggle } from "@/components/LangToggle";
 import { useLang } from "@/contexts/LanguageContext";
 const beforeRoom = new URL("@/assets/before-room.jpg", import.meta.url).href;

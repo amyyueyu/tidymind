@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { TiddyMascot } from "@/components/TiddyMascot";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useGuestMode, GuestRoom, GuestChallenge } from "@/contexts/GuestModeContext";

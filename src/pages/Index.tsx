@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { TiddyMascot } from "@/components/TiddyMascot";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
