@@ -472,7 +472,7 @@ const Capture = () => {
                   {generatingVision ? (
                     <div className="aspect-[4/3] bg-muted flex items-center justify-center">
                       <div className="text-center">
-                        <Sparkles className="w-12 h-12 text-primary mx-auto mb-3 animate-pulse" />
+                        <TiddyMascot size="xl" rounded="square" className="mx-auto mb-3" />
                         <p className="font-medium">{t('capture.vision.loading')}</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           {t('capture.vision.sub')}

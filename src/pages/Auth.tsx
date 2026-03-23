@@ -243,8 +243,8 @@ const Auth = () => {
           </div>
  
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center mb-4">
-              <img src={logoImg} alt="TidyMate logo" className="w-20 h-20 rounded-3xl" />
+          <div className="inline-flex items-center justify-center mb-4">
+              <TiddyMascot size="lg" rounded="square" className="ring-2 ring-primary/20" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">TidyMate</h1>
             <p className="text-muted-foreground mt-2">

@@ -285,8 +285,8 @@ const Index = () => {
             <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full bg-primary/10 flex items-end justify-start pl-6 pb-4">
               <Leaf className="w-8 h-8 text-primary opacity-60" />
             </div>
-            <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-6">
-              <Camera className="w-8 h-8 text-primary-foreground" />
+            <div className="mb-6">
+              <TiddyMascot size="lg" rounded="square" />
             </div>
             <h2 className="text-2xl font-bold text-foreground leading-snug mb-3">
               {t('onboard.title')}
