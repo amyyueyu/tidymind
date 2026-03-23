@@ -453,7 +453,7 @@ const Capture = () => {
           >
             {analyzing ? (
               <span className="flex items-center gap-2">
-                <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                <TiddyMascot size="sm" rounded="circle" className="ring-1 ring-primary-foreground/20" />
                 {t('capture.analyzing')}
               </span>
             ) : (
