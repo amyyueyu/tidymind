@@ -12,11 +12,12 @@ import { Sparkles, ArrowRight } from "lucide-react";
 import { TiddyMascot } from "@/components/TiddyMascot";
 import { LangToggle } from "@/components/LangToggle";
 import { useLang } from "@/contexts/LanguageContext";
+import { analytics, identifyUser } from "@/lib/analytics";
+
 const beforeRoom = new URL("@/assets/before-room.jpg", import.meta.url).href;
 const afterRoom = new URL("@/assets/after-room.jpg", import.meta.url).href;
 const beforeBedroom = new URL("@/assets/before-bedroom.jpg", import.meta.url).href;
 const afterBedroom = new URL("@/assets/after-bedroom.jpg", import.meta.url).href;
-import { analytics, identifyUser } from "@/lib/analytics";
 
 const Auth = () => {
   const navigate = useNavigate();
