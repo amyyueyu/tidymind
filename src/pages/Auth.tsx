@@ -9,15 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/sonner";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { TiddyMascot } from "@/components/TiddyMascot";
+import logoImg from "@/assets/logo.png";
 import { LangToggle } from "@/components/LangToggle";
 import { useLang } from "@/contexts/LanguageContext";
-import { analytics, identifyUser } from "@/lib/analytics";
-
 const beforeRoom = new URL("@/assets/before-room.jpg", import.meta.url).href;
 const afterRoom = new URL("@/assets/after-room.jpg", import.meta.url).href;
 const beforeBedroom = new URL("@/assets/before-bedroom.jpg", import.meta.url).href;
 const afterBedroom = new URL("@/assets/after-bedroom.jpg", import.meta.url).href;
+import { analytics, identifyUser } from "@/lib/analytics";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -244,8 +243,8 @@ const Auth = () => {
           </div>
  
           <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-              <TiddyMascot size="lg" rounded="square" className="ring-2 ring-primary/20" />
+            <div className="inline-flex items-center justify-center mb-4">
+              <img src={logoImg} alt="TidyMate logo" className="w-20 h-20 rounded-3xl" />
             </div>
             <h1 className="text-3xl font-bold text-foreground">TidyMate</h1>
             <p className="text-muted-foreground mt-2">

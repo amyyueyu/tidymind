@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { TiddyMascot } from "@/components/TiddyMascot";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useGuestMode, GuestRoom, GuestChallenge } from "@/contexts/GuestModeContext";
@@ -453,7 +452,7 @@ const Capture = () => {
           >
             {analyzing ? (
               <span className="flex items-center gap-2">
-                <TiddyMascot size="sm" rounded="circle" className="ring-1 ring-primary-foreground/20" />
+                <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                 {t('capture.analyzing')}
               </span>
             ) : (
@@ -472,7 +471,7 @@ const Capture = () => {
                   {generatingVision ? (
                     <div className="aspect-[4/3] bg-muted flex items-center justify-center">
                       <div className="text-center">
-                        <TiddyMascot size="xl" rounded="square" className="mx-auto mb-3" />
+                        <Sparkles className="w-12 h-12 text-primary mx-auto mb-3 animate-pulse" />
                         <p className="font-medium">{t('capture.vision.loading')}</p>
                         <p className="text-sm text-muted-foreground mt-1">
                           {t('capture.vision.sub')}
